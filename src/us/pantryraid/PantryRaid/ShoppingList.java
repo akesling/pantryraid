@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 public class ShoppingList extends Activity {
     // For logging and debugging purposes
-    private static final String TAG = "Pantry";
+    private static final String TAG = "ShoppingList";
     
     /** Called when the activity is first created. */
     @Override
