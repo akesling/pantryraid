@@ -199,7 +199,7 @@ public class ItemsDbAdapter {
      * @return true if the item was successfully updated, false otherwise
      */
     public boolean updateItem(long rowId, String item_type, String store, 
-    		float quantity, float threshold, long last_updated) {
+    		double quantity, double threshold, long last_updated) {
         ContentValues args = new ContentValues();
         args.put(KEY_ITEM_TYPE, item_type);
         args.put(KEY_STORE, store);
