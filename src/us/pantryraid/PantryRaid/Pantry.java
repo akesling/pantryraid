@@ -67,6 +67,7 @@ public class Pantry extends ListActivity {
     	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
     	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
     	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
+    	i.putExtra("intent", "view");
     	startActivityForResult(i, ACTIVITY_VIEW);
     }
     

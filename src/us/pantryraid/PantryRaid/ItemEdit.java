@@ -34,15 +34,20 @@ public class ItemEdit extends Activity {
 		mRowId = null;
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-		    String item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
+		    String itemType = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
 		    String store = extras.getString(ItemsDbAdapter.KEY_STORE);
 		    Double quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
 		    Double threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
 		    mRowId = extras.getLong(ItemsDbAdapter.KEY_ROWID);
+		    
+		    String intentState = extras.getString("intent");
+		    if (intentState != null && intentState.equals("view")) {
+		    	confirmButton.setText("Save Item");
+		    }
 
-		    if (item_type != null) {
-		        mItemTypeText.setText(item_type);
-	            Log.w(TAG, "Setting ItemType to " + item_type);
+		    if (itemType != null) {
+		        mItemTypeText.setText(itemType);
+	            Log.w(TAG, "Setting ItemType to " + itemType);
 		    }
 		    if (store != null) {
 		        mStoreText.setText(store);
