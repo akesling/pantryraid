@@ -25,6 +25,7 @@ public class ItemsDbAdapter {
     public static final String KEY_QUANTITY = "quantity";
     public static final String KEY_THRESHOLD = "threshold";
     public static final String KEY_LAST_UPDATED = "last_updated";
+    public static final String KEY_CHECKED = "checked";
     public static final String KEY_ROWID = "_id";
 
     private static final String TAG = "ItemsDbAdapter";
@@ -40,11 +41,12 @@ public class ItemsDbAdapter {
         "store text," +
         "quantity real not null, " +
         "threshold real," +
+        "checked boolean default 0 not null, " +
         "last_updated integer not null);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "items";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private final Context mCtx;
 
@@ -145,7 +147,7 @@ public class ItemsDbAdapter {
     public Cursor fetchAllItems() {
 
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_ITEM_TYPE,
-                KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_LAST_UPDATED},
+                KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_CHECKED, KEY_LAST_UPDATED},
                 null, null, null, null, null);
     }
 
@@ -160,7 +162,7 @@ public class ItemsDbAdapter {
 
         Cursor mCursor =
             mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID, KEY_ITEM_TYPE,
-                    KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_LAST_UPDATED}, 
+                    KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_CHECKED, KEY_LAST_UPDATED}, 
                     KEY_ROWID + "=" + rowId, null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -191,6 +193,13 @@ public class ItemsDbAdapter {
         args.put(KEY_THRESHOLD, threshold);
         args.put(KEY_LAST_UPDATED, last_updated);
 
+        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
+    
+    public boolean setItemChecked(long rowId, boolean value) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_CHECKED, value);
+        
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
 }

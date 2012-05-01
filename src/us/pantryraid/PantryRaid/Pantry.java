@@ -122,7 +122,7 @@ public class Pantry extends ListActivity {
         
         // Now create an array adapter and set it to display using our row
         SimpleCursorAdapter notes =
-            new SimpleCursorAdapter(this, R.layout.list_item, mItemsCursor, from, to);
+            new SimpleCursorAdapter(this, R.layout.pantry_item, mItemsCursor, from, to);
         setListAdapter(notes);
     }
 }
