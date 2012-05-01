@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, Pantry!</string>
+    <string name="menu_insert">Add Item</string>
     <string name="app_name">PantryRaid</string>
+    <string name="no_items">No Items Yet</string>
 
 </resources>
