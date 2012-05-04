@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, Pantry!</string>
+    <string name="menu_insert">Add Item</string>
     <string name="app_name">PantryRaid</string>
     <string name="menu_search">Search</string>
     <string name="search_label">Pantry</string>
     <string name="search_hint">Search your pantry</string>
     <string name="settings_description">Inventory of Pantry</string>
+    <string name="no_items">No Items Yet</string>
 
 </resources>

@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 public class Search extends Activity {
     // For logging and debugging purposes
-    private static final String TAG = "Pantry";
+    private static final String TAG = "Search";
     
     /** Called when the activity is first created. */
     @Override
