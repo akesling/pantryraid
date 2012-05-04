@@ -8,5 +8,7 @@
     <string name="search_hint">Search your pantry</string>
     <string name="settings_description">Inventory of Pantry</string>
     <string name="no_items">No Items Yet</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_cancel">Cancel</string>
 
 </resources>

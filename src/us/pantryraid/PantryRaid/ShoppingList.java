@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,17 +19,22 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 public class ShoppingList extends ListActivity {
-    private static final int ACTIVITY_CREATE=0;
-    private static final int ACTIVITY_VIEW=1;
-    
+//	private static final String RETURN_ACTION = "Return Action";
+//    private static final int ITEM_CANCELED=0;
+//    private static final int ITEM_SAVED=1;
+	private static final int ACTIVITY_CREATE = 0;
+	private static final int ACTIVITY_VIEW = 1;
+	
+	
+
     private ItemsDbAdapter mDbHelper;
-    private Cursor mItemsCursor;
+//    private Cursor mItemsCursor;
     private static Context mCtx;
     
     // For logging and debugging purposes
     private static final String TAG = "ShoppingList";
     public static final int INSERT_ID = Menu.FIRST;
-    private int mItemNumber = 1;
+//    private int mItemNumber = 1;
     
     /** Called when the activity is first created. */
     @Override
@@ -38,11 +44,13 @@ public class ShoppingList extends ListActivity {
         setContentView(R.layout.pantry_list);
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
-        //fillData();
+        fillData();
+        Log.w(TAG, "Data filled.");
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+    	Log.w(TAG, "Entering OptionMenu creation.");
        // boolean result = super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
         
@@ -55,6 +63,7 @@ public class ShoppingList extends ListActivity {
         	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setIconifiedByDefault(false);
         }
+        Log.w(TAG, "OptionsMenu built.");
     	return true;
     }
 
@@ -76,58 +85,58 @@ public class ShoppingList extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
     	super.onListItemClick(l, v, position, id);
-    	Cursor c = mItemsCursor;
-    	c.moveToPosition(position);
+//    	Cursor c = mItemsCursor;
+//    	c.moveToPosition(position);
     	Intent i = new Intent(this, ItemEdit.class);
     	i.putExtra(ItemsDbAdapter.KEY_ROWID, id);
-    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
-    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
-    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
-    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
-    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
-    	i.putExtra("intent", "view");
+//    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
+//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
+//    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
+//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
+//    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
+//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
+//    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
+//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
+//    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
+//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
+//    	i.putExtra("intent", "view");
     	startActivityForResult(i, ACTIVITY_VIEW);
     }
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
     	super.onActivityResult(requestCode, resultCode, intent);
-    	Bundle extras = intent.getExtras();
-    	
-	    String item_type;
-	    String store;
-	    Double quantity;
-	    Double threshold;
-	    Long last_updated;
-
-    	switch(requestCode) {
-    	case ACTIVITY_CREATE:
-    	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-    	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-    	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-    	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-    	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-    	    mDbHelper.createItem(item_type, store, quantity, threshold, last_updated);
+//    	Bundle extras = intent.getExtras();
+//    	
+//	    String item_type;
+//	    String store;
+//	    Double quantity;
+//	    Double threshold;
+//	    Long last_updated;
+//
+//    	switch(extras.getInt(RETURN_ACTION)) {
+//    	case ITEM_CANCELLED:
+//    	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
+//    	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
+//    	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
+//    	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
+//    	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
+//    	    mDbHelper.createItem(item_type, store, quantity, threshold, last_updated);
     	    fillData();
-    	    break;
-    	case ACTIVITY_VIEW:
-    	    Long mRowId = extras.getLong(ItemsDbAdapter.KEY_ROWID);
-    	    if (mRowId != null) {
-        	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-        	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-        	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-        	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-        	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-        	    mDbHelper.updateItem(mRowId, item_type, store, quantity, threshold, last_updated);
-    	    }
-    	    fillData();
-    	    break;
-    	}
+//    	    break;
+//    	case ITEM_SAVED:
+//    	    Long mRowId = extras.getLong(ItemsDbAdapter.KEY_ROWID);
+//    	    if (mRowId != null) {
+//        	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
+//        	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
+//        	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
+//        	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
+//        	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
+//        	    mDbHelper.updateItem(mRowId, item_type, store, quantity, threshold, last_updated);
+//    	    }
+//    	    fillData();
+//    	    break;
+//    	}
     }
 
     private void createItem() {
@@ -137,14 +146,17 @@ public class ShoppingList extends ListActivity {
     
     private void fillData() {
         // Get all of the notes from the database and create the item list
-        mItemsCursor = mDbHelper.fetchShoppingList();
+    	Cursor ItemsCursor = mDbHelper.loadShoppingListItems();
         //mItemsCursor = mDbHelper.fetchAllItems();
-        startManagingCursor(mItemsCursor);
+        startManagingCursor(ItemsCursor);
         
         // Now create an array adapter and set it to display using our row
         ShoppingListAdapter items =
-            new ShoppingListAdapter(this, R.layout.shopping_list_item, mItemsCursor);
+            new ShoppingListAdapter(this, R.layout.shopping_list_item, ItemsCursor);
+        Log.w(TAG, "Setting list adapter.");
         setListAdapter(items);
+        Log.w(TAG, "List adapter set.");
+
     }
     
     private class ShoppingListAdapter extends ResourceCursorAdapter {
