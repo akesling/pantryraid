@@ -1,7 +1,7 @@
 package us.pantryraid.PantryRaid;
 
 import android.app.ActionBar;
-import android.app.ListActivity;
+import android.app.ListActivity; 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,6 +29,9 @@ public class ShoppingList extends ListActivity {
     public static final int INSERT_ID = Menu.FIRST;
     private int mItemNumber = 1;
     
+    //XXX: Flag such that callbacks don't get called on first instantiation.
+    private boolean onCreateFlag = true;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {  
@@ -41,17 +44,23 @@ public class ShoppingList extends ListActivity {
         // setup action bar for spinner
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         ArrayAdapter<CharSequence> actionBarSpinner = 
-        		ArrayAdapter.createFromResource(this, R.array.view_select_shoplist, 
+        		ArrayAdapter.createFromResource(this, R.array.actionbar_view_select, 
         				android.R.layout.simple_spinner_item);
         actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bar.setSelectedNavigationItem(1);
         bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
 
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition,
 					long itemId) {
 				
+				if (onCreateFlag) {
+					onCreateFlag = false;
+					return true;
+				}
+				
 				switch(itemPosition) {
-				case 1:
+				case 0:
 			    	startActivity(new Intent(mCtx, Pantry.class));
 			    	return true;
 				}		    	
@@ -68,7 +77,21 @@ public class ShoppingList extends ListActivity {
         fillData();
         Log.w(TAG, "Hello "+TAG+".");
     }
-        
+    
+    public void onStart(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(1);
+    }
+    
+    public void onResume(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(1);
+    }
+    
+    public void onStop(Bundle savedInstanceState) {
+    	mDbHelper.close();
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);
@@ -80,7 +103,7 @@ public class ShoppingList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case INSERT_ID:
-            createItem();
+            getActionBar().setSelectedNavigationItem(1);
             return true;
         }
        

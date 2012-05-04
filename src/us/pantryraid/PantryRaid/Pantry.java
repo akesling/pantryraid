@@ -27,6 +27,9 @@ public class Pantry extends ListActivity {
     public static final int INSERT_ID = Menu.FIRST;
     private int mItemNumber = 1;
     
+    //XXX: Flag such that callbacks don't get called on first instantiation.
+    private boolean onCreateFlag = true;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {   
@@ -43,14 +46,21 @@ public class Pantry extends ListActivity {
         // setup action bar for spinner
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         ArrayAdapter<CharSequence> actionBarSpinner = 
-        		ArrayAdapter.createFromResource(this, R.array.view_select_pantry, 
+        		ArrayAdapter.createFromResource(this, R.array.actionbar_view_select, 
         				android.R.layout.simple_spinner_item);
         actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bar.setSelectedNavigationItem(0);
+        
         bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
         	
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition,
 					long itemId) {
+				
+				if (onCreateFlag) {
+					onCreateFlag = false;
+					return true;
+				}
 				
 		        Log.w(TAG, "Item "+itemPosition+" selected.");
 				
@@ -70,6 +80,20 @@ public class Pantry extends ListActivity {
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
         fillData();
+    }
+    
+    public void onStart(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(0);
+    }
+    
+    public void onResume(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(0);
+    }
+    
+    public void onStop(Bundle savedInstanceState) {
+    	mDbHelper.close();
     }
         
     @Override
