@@ -72,6 +72,8 @@ public class ShoppingList extends ListActivity {
         
         //Populate list
         setContentView(R.layout.pantry_list);
+        registerForContextMenu(getListView());
+
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
         fillData();
@@ -103,7 +105,7 @@ public class ShoppingList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case INSERT_ID:
-            getActionBar().setSelectedNavigationItem(1);
+            createItem();
             return true;
         }
        

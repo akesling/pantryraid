@@ -7,12 +7,18 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ResourceCursorAdapter;
+import android.widget.TextView;
 
 public class Pantry extends ListActivity {
     private static final int ACTIVITY_CREATE=0;
@@ -76,6 +82,7 @@ public class Pantry extends ListActivity {
         });
         
         setContentView(R.layout.pantry_list);
+        
         Log.w(TAG, "Hello "+TAG+".");
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
@@ -112,6 +119,24 @@ public class Pantry extends ListActivity {
         }
        
         return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        Log.w(TAG, "Creating context menu.");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.pantry_context, menu);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -178,15 +203,67 @@ public class Pantry extends ListActivity {
     
     private void fillData() {
         // Get all of the notes from the database and create the item list
+    	Log.w(TAG, "Fetching items.");
         mItemsCursor = mDbHelper.fetchAllItems();
         startManagingCursor(mItemsCursor);
-
-        String[] from = new String[] { ItemsDbAdapter.KEY_ITEM_TYPE };
-        int[] to = new int[] { R.id.text1 };
         
         // Now create an array adapter and set it to display using our row
-        SimpleCursorAdapter notes =
-            new SimpleCursorAdapter(this, R.layout.pantry_item, mItemsCursor, from, to);
-        setListAdapter(notes);
+        PantryListAdapter items =
+            new PantryListAdapter(this, R.layout.pantry_item, mItemsCursor);
+    	Log.w(TAG, "Setting list adapter.");
+        setListAdapter(items);
+        Log.w(TAG, "Returned from list adapter.");
+    }
+    
+    private class PantryListAdapter extends ResourceCursorAdapter {
+
+		public PantryListAdapter(Context context, int layout, Cursor c) {
+			super(context, layout, c);
+		}
+
+		@Override
+		public void bindView(View view, Context context, final Cursor cursor) {
+			TextView pantryListText = (TextView)view.findViewById(R.id.pantryListText);
+			Button pantryListButton = (Button)view.findViewById(R.id.pantryListContextButton);
+			
+			registerForContextMenu(pantryListButton);
+		    pantryListButton.setLongClickable(false);
+			
+			pantryListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+
+			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
+			final int cursorPos = cursor.getPosition();
+			
+			pantryListText.setOnClickListener(new View.OnClickListener() {
+
+			    public void onClick(View view) {
+			    	Cursor c = cursor;
+			    	c.moveToPosition(cursorPos);
+			    	Intent i = new Intent(mCtx, ItemEdit.class);
+			    	i.putExtra(ItemsDbAdapter.KEY_ROWID, rowId);
+			    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
+			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
+			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
+			    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
+			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
+			    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
+			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
+			    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
+			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
+			    	i.putExtra("intent", "view");
+			    	startActivityForResult(i, ACTIVITY_VIEW);
+			    }
+			    
+			});
+			
+			pantryListText.setOnClickListener(new View.OnClickListener() {
+
+			    public void onClick(View view) {
+			        openContextMenu(view);
+			    }
+			    
+			});
+		}
     }
 }

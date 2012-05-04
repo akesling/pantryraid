@@ -8,5 +8,9 @@
         <item>Pantry</item>
         <item>Shopping List</item>
     </string-array>
+    <string name="delete_from_pantry">Remove Item from Pantry</string>
+    <string name="use_item">Use Some of This Item</string>
+    <string name="add_item_shoplist">Add this item to your shopping list</string>
+    <string name="item_details">View Item Details</string>
 
 </resources>

@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text1"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:padding="5dp"
-    android:paddingLeft="10dp"
-    android:textSize="16sp" >
-</TextView>
+    android:layout_height="fill_parent">
+    
+	<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/pantryListText"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:padding="5dp"
+	    android:paddingLeft="10dp"
+	    android:textSize="16sp"
+	    android:layout_alignParentLeft="true">
+	</TextView>
+	
+	<Button
+	    android:id="@+id/pantryListContextButton"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:text="Menu" />
+
+</RelativeLayout>
