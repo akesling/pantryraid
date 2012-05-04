@@ -1,12 +1,16 @@
 package us.pantryraid.PantryRaid;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -16,6 +20,7 @@ public class Pantry extends ListActivity {
     
     private ItemsDbAdapter mDbHelper;
     private Cursor mItemsCursor;
+    private static Context mCtx;
     
     // For logging and debugging purposes
     private static final String TAG = "Pantry";
@@ -24,14 +29,49 @@ public class Pantry extends ListActivity {
     
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {    	
+    public void onCreate(Bundle savedInstanceState) {   
         super.onCreate(savedInstanceState);
+        mCtx = (Context) this;
+
+        ActionBar bar = getActionBar();
+        bar.setDisplayShowTitleEnabled(false);
+        
+        Log.w(TAG, "Creating array adapter.");
+        // Populate spinner dropdown
+
+        Log.i(TAG, "Linking ActionBar.");
+        // setup action bar for spinner
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        ArrayAdapter<CharSequence> actionBarSpinner = 
+        		ArrayAdapter.createFromResource(this, R.array.view_select_pantry, 
+        				android.R.layout.simple_spinner_item);
+        actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
+        	
+			@Override
+			public boolean onNavigationItemSelected(int itemPosition,
+					long itemId) {
+				
+		        Log.w(TAG, "Item "+itemPosition+" selected.");
+				
+				switch(itemPosition) {
+				case 1:
+			    	startActivity(new Intent(mCtx, ShoppingList.class));
+			    	return true;
+				}
+				
+				return false;
+			}
+        	
+        });
+        
         setContentView(R.layout.pantry_list);
+        Log.w(TAG, "Hello "+TAG+".");
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
         fillData();
     }
-    
+        
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);

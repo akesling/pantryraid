@@ -1,13 +1,16 @@
 package us.pantryraid.PantryRaid;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
@@ -28,15 +31,44 @@ public class ShoppingList extends ListActivity {
     
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {    	
+    public void onCreate(Bundle savedInstanceState) {  
         super.onCreate(savedInstanceState);
         mCtx = (Context) this;
+        
+        ActionBar bar = getActionBar();
+        bar.setDisplayShowTitleEnabled(false);
+
+        // setup action bar for spinner
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        ArrayAdapter<CharSequence> actionBarSpinner = 
+        		ArrayAdapter.createFromResource(this, R.array.view_select_shoplist, 
+        				android.R.layout.simple_spinner_item);
+        actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
+
+			@Override
+			public boolean onNavigationItemSelected(int itemPosition,
+					long itemId) {
+				
+				switch(itemPosition) {
+				case 1:
+			    	startActivity(new Intent(mCtx, Pantry.class));
+			    	return true;
+				}		    	
+				
+				return false;
+			}
+        	
+        });
+        
+        //Populate list
         setContentView(R.layout.pantry_list);
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
         fillData();
+        Log.w(TAG, "Hello "+TAG+".");
     }
-    
+        
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);

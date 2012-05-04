@@ -4,5 +4,13 @@
     <string name="menu_insert">Add Item</string>
     <string name="app_name">PantryRaid</string>
     <string name="no_items">No Items Yet</string>
+    <string-array name="view_select_pantry">
+        <item>Pantry</item>
+        <item>Shopping List</item>
+    </string-array>
+    <string-array name="view_select_shoplist">
+        <item>Shopping List</item>
+        <item>Pantry</item>
+    </string-array>
 
 </resources>
