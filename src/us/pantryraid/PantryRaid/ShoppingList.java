@@ -1,5 +1,6 @@
 package us.pantryraid.PantryRaid;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -12,11 +13,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.SearchView;
 import android.widget.TextView;
+
+
 
 public class ShoppingList extends ListActivity {
 //	private static final String RETURN_ACTION = "Return Action";
@@ -36,16 +40,69 @@ public class ShoppingList extends ListActivity {
     public static final int INSERT_ID = Menu.FIRST;
 //    private int mItemNumber = 1;
     
+    //XXX: Flag such that callbacks don't get called on first instantiation.
+    private boolean onCreateFlag = true;
+    
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {    	
+    public void onCreate(Bundle savedInstanceState) {  
         super.onCreate(savedInstanceState);
         mCtx = (Context) this;
+        
+        ActionBar bar = getActionBar();
+        bar.setDisplayShowTitleEnabled(false);
+
+        // setup action bar for spinner
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        ArrayAdapter<CharSequence> actionBarSpinner = 
+        		ArrayAdapter.createFromResource(this, R.array.actionbar_view_select, 
+        				android.R.layout.simple_spinner_item);
+        actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        bar.setSelectedNavigationItem(1);
+        bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
+
+			@Override
+			public boolean onNavigationItemSelected(int itemPosition,
+					long itemId) {
+				
+				if (onCreateFlag) {
+					onCreateFlag = false;
+					return true;
+				}
+				
+				switch(itemPosition) {
+				case 0:
+			    	startActivity(new Intent(mCtx, Pantry.class));
+			    	return true;
+				}		    	
+				
+				return false;
+			}
+        	
+        });
+        
+        //Populate list
         setContentView(R.layout.pantry_list);
+        registerForContextMenu(getListView());
+
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
         fillData();
         Log.w(TAG, "Data filled.");
+    }
+    
+    public void onStart(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(1);
+    }
+    
+    public void onResume(Bundle savedInstanceState) {
+    	ActionBar bar = getActionBar();
+        bar.setSelectedNavigationItem(1);
+    }
+    
+    public void onStop(Bundle savedInstanceState) {
+    	mDbHelper.close();
     }
     
     @Override
