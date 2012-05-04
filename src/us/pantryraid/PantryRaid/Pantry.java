@@ -42,7 +42,7 @@ public class Pantry extends ListActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        boolean result = super.onCreateOptionsMenu(menu);
+       // boolean result = super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
         
         MenuInflater inflater = getMenuInflater();
@@ -63,12 +63,12 @@ public class Pantry extends ListActivity {
         case INSERT_ID:
             createItem();
             return true;
-            case R.id.search:
-                onSearchRequested();
-                return true;
-            default:
-                return false;
-        
+        case R.id.search:
+        	onSearchRequested();
+        	return true;
+        default:
+        	return false;
+
         }
     }
 
@@ -141,7 +141,8 @@ public class Pantry extends ListActivity {
     };
     private void fillData() {
         // Get all of the notes from the database and create the item list
-        mItemsCursor = mDbHelper.fetchAllItems();
+        
+    	mItemsCursor = mDbHelper.fetchPantryItems();
         startManagingCursor(mItemsCursor);
 
         String[] from = new String[] { ItemsDbAdapter.KEY_ITEM_TYPE };

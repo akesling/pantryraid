@@ -1,16 +1,20 @@
 package us.pantryraid.PantryRaid;
 
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 public class ShoppingList extends ListActivity {
@@ -34,25 +38,39 @@ public class ShoppingList extends ListActivity {
         setContentView(R.layout.pantry_list);
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
-        fillData();
+        //fillData();
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        boolean result = super.onCreateOptionsMenu(menu);
+       // boolean result = super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-        return result;
+        
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        	SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false);
+        }
+    	return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+    	switch (item.getItemId()) {
         case INSERT_ID:
             createItem();
             return true;
+        case R.id.search:
+        	onSearchRequested();
+        	return true;
+        default:
+        	return false;
+
         }
-       
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -119,7 +137,8 @@ public class ShoppingList extends ListActivity {
     
     private void fillData() {
         // Get all of the notes from the database and create the item list
-        mItemsCursor = mDbHelper.fetchAllItems();
+        mItemsCursor = mDbHelper.fetchShoppingList();
+        //mItemsCursor = mDbHelper.fetchAllItems();
         startManagingCursor(mItemsCursor);
         
         // Now create an array adapter and set it to display using our row

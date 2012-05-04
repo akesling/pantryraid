@@ -26,7 +26,9 @@ public class ItemsDbAdapter {
     public static final String KEY_THRESHOLD = "threshold";
     public static final String KEY_LAST_UPDATED = "last_updated";
     public static final String KEY_CHECKED = "checked";
-    public static final String KEY_ROWID = "_id";
+    public static final String KEY_ROWID = "rowid";
+    public static final String[] ALL_COLUMNS = new String[] {KEY_ROWID, KEY_ITEM_TYPE,
+            KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_CHECKED, KEY_LAST_UPDATED};
 
     private static final String TAG = "ItemsDbAdapter";
     private DatabaseHelper mDbHelper;
@@ -36,7 +38,7 @@ public class ItemsDbAdapter {
      * Database creation sql statement
      */
     private static final String DATABASE_CREATE =
-        "create table items (_id integer primary key autoincrement, " +
+        "create virtual table items using fts3 (" +
         "item_type text not null, " +
         "store text," +
         "quantity real not null, " +
@@ -47,6 +49,7 @@ public class ItemsDbAdapter {
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "items";
     private static final int DATABASE_VERSION = 2;
+    
 
     private final Context mCtx;
 
@@ -146,11 +149,18 @@ public class ItemsDbAdapter {
      */
     public Cursor fetchAllItems() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_ITEM_TYPE,
-                KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_CHECKED, KEY_LAST_UPDATED},
+        return mDb.query(DATABASE_TABLE, ALL_COLUMNS,
                 null, null, null, null, null);
     }
 
+    public Cursor searchDatabase(String query){
+    	
+    	
+    	
+    	return mDb.query(DATABASE_TABLE, ALL_COLUMNS, 
+                (DATABASE_TABLE + " MATCHES '?'") , new String[] {query}, null, null, null);
+    }
+    
     /**
      * Return a Cursor positioned at the item that matches the given rowId
      * 
@@ -161,8 +171,7 @@ public class ItemsDbAdapter {
     public Cursor fetchItem(long rowId) throws SQLException {
 
         Cursor mCursor =
-            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID, KEY_ITEM_TYPE,
-                    KEY_STORE, KEY_QUANTITY, KEY_THRESHOLD, KEY_CHECKED, KEY_LAST_UPDATED}, 
+            mDb.query(true, DATABASE_TABLE, ALL_COLUMNS, 
                     KEY_ROWID + "=" + rowId, null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -202,4 +211,18 @@ public class ItemsDbAdapter {
         
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
+
+	
+
+    public Cursor fetchPantryItems() {
+		
+		return mDb.query(DATABASE_TABLE, ALL_COLUMNS, 
+				KEY_QUANTITY + " > 0;", null, null, null, null);
+	}
+
+	public Cursor fetchShoppingList() {
+		return mDb.query(DATABASE_TABLE, ALL_COLUMNS, 
+				KEY_QUANTITY + " < " + KEY_THRESHOLD + ";", 
+				null, null, null, null);
+	}
 }
