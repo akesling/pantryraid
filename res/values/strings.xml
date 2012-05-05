@@ -3,20 +3,24 @@
 
     <string name="menu_insert">Add Item</string>
     <string name="app_name">PantryRaid</string>
+    <string name="menu_search">Search</string>
+    <string name="search_label">Pantry</string>
+    <string name="search_hint">Search your pantry</string>
+    <string name="settings_description">Inventory of Pantry</string>
     <string name="no_items">No Items Yet</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_cancel">Cancel</string>
+
     <string-array name="actionbar_view_select">
         <item>Pantry</item>
         <item>Shopping List</item>
     </string-array>
+
     <string name="delete_from_pantry">Remove Item from Pantry</string>
     <string name="use_item">Use Some of This Item</string>
     <string name="add_item_shoplist">Add this item to your shopping list</string>
     <string name="item_details">View Item Details</string>
     <string name="add_item_pantry">Add Quantity Purchased to Pantry</string>
     <string name="delete_from_shopping_list">Remove This From Shopping List</string>
-    <string name="menu_search">Search</string>
-    <string name="search_label">Pantry</string>
-    <string name="search_hint">Search your pantry</string>
-    <string name="settings_description">Inventory of Pantry</string>
 
 </resources>
