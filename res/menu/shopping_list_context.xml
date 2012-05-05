@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/delete_item"
+          android:title="@string/delete_from_shopping_list"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/add_item_pantry"
+          android:title="@string/add_item_pantry" />
+    <item android:id="@+id/item_details"
+          android:title="@string/item_details" />
+</menu>
