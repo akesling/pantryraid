@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.SearchView;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 
@@ -39,7 +40,7 @@ public class Pantry extends ListActivity {
 //    private int mItemNumber = 1;
     
     //XXX: Flag such that callbacks don't get called on first instantiation.
-    private boolean onCreateFlag = true;
+//    private boolean onCreateFlag = true;
 
     /** Called when the activity is first created. */
     @Override
@@ -49,6 +50,7 @@ public class Pantry extends ListActivity {
 
         ActionBar bar = getActionBar();
         bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         
         Log.w(TAG, "Creating array adapter.");
         // Populate spinner dropdown
@@ -68,10 +70,10 @@ public class Pantry extends ListActivity {
             public boolean onNavigationItemSelected(int itemPosition,
                     long itemId) {
                 
-                if (onCreateFlag) {
-                    onCreateFlag = false;
-                    return true;
-                }
+//                if (onCreateFlag) {
+//                    onCreateFlag = false;
+//                    return true;
+//                }
                 
                 Log.w(TAG, "Item "+itemPosition+" selected.");
                 
@@ -85,6 +87,14 @@ public class Pantry extends ListActivity {
             }
             
         });
+//        
+//        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionbar_view_select,
+//        		android.R.layout.simple_spinner_dropdown_item);
+//        
+        
+        
+        
+        
         
         setContentView(R.layout.pantry_list);
         
@@ -96,12 +106,12 @@ public class Pantry extends ListActivity {
     
     public void onStart(Bundle savedInstanceState) {
         ActionBar bar = getActionBar();
-        bar.setSelectedNavigationItem(0);
+        //bar.setSelectedNavigationItem(0);
     }
     
     public void onResume(Bundle savedInstanceState) {
         ActionBar bar = getActionBar();
-        bar.setSelectedNavigationItem(0);
+       // bar.setSelectedNavigationItem(0);
     }
     
     public void onStop(Bundle savedInstanceState) {
