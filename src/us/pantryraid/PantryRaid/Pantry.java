@@ -138,27 +138,6 @@ public class Pantry extends ListActivity {
                 return super.onContextItemSelected(item);
         }
     }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-    	super.onListItemClick(l, v, position, id);
-    	Cursor c = mItemsCursor;
-    	c.moveToPosition(position);
-    	Intent i = new Intent(this, ItemEdit.class);
-    	i.putExtra(ItemsDbAdapter.KEY_ROWID, id);
-    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
-    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
-    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
-    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
-    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
-    	i.putExtra("intent", "view");
-    	startActivityForResult(i, ACTIVITY_VIEW);
-    }
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -223,11 +202,11 @@ public class Pantry extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, final Cursor cursor) {
-			TextView pantryListText = (TextView)view.findViewById(R.id.pantryListText);
-			Button pantryListButton = (Button)view.findViewById(R.id.pantryListContextButton);
+			TextView pantryListText = (TextView)view.findViewById(R.id.pantryItemText);
+			Button pantryItemButton = (Button)view.findViewById(R.id.pantryItemContextButton);
 			
-			registerForContextMenu(pantryListButton);
-		    pantryListButton.setLongClickable(false);
+			registerForContextMenu(pantryItemButton);
+		    pantryItemButton.setLongClickable(false);
 			
 			pantryListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
 
@@ -257,10 +236,10 @@ public class Pantry extends ListActivity {
 			    
 			});
 			
-			pantryListText.setOnClickListener(new View.OnClickListener() {
+			pantryItemButton.setOnClickListener(new View.OnClickListener() {
 
 			    public void onClick(View view) {
-			        openContextMenu(view);
+			    	openContextMenu(view);
 			    }
 			    
 			});

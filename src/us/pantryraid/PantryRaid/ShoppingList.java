@@ -7,14 +7,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class ShoppingList extends ListActivity {
     private static final int ACTIVITY_CREATE=0;
@@ -40,6 +45,8 @@ public class ShoppingList extends ListActivity {
         
         ActionBar bar = getActionBar();
         bar.setDisplayShowTitleEnabled(false);
+        
+        Log.w(TAG, "Setting up ActionBar");
 
         // setup action bar for spinner
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -48,6 +55,8 @@ public class ShoppingList extends ListActivity {
         				android.R.layout.simple_spinner_item);
         actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         bar.setSelectedNavigationItem(1);
+        
+        Log.w(TAG, "Navigation list setup.");
         bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
 
 			@Override
@@ -70,9 +79,10 @@ public class ShoppingList extends ListActivity {
         	
         });
         
+        Log.w(TAG, "Navigation callback set.");
+        
         //Populate list
         setContentView(R.layout.pantry_list);
-        registerForContextMenu(getListView());
 
         mDbHelper = new ItemsDbAdapter(this);
         mDbHelper.open();
@@ -81,21 +91,25 @@ public class ShoppingList extends ListActivity {
     }
     
     public void onStart(Bundle savedInstanceState) {
+        Log.w(TAG, "Calling onStart");
     	ActionBar bar = getActionBar();
         bar.setSelectedNavigationItem(1);
     }
     
     public void onResume(Bundle savedInstanceState) {
+        Log.w(TAG, "Calling onResume");
     	ActionBar bar = getActionBar();
         bar.setSelectedNavigationItem(1);
     }
     
     public void onStop(Bundle savedInstanceState) {
+        Log.w(TAG, "Calling onStop");
     	mDbHelper.close();
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.w(TAG, "Calling onCreateOptionsMenu");
         boolean result = super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
         return result;
@@ -103,6 +117,7 @@ public class ShoppingList extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.w(TAG, "Calling onOptionsItemSelected");
         switch (item.getItemId()) {
         case INSERT_ID:
             createItem();
@@ -111,26 +126,23 @@ public class ShoppingList extends ListActivity {
        
         return super.onOptionsItemSelected(item);
     }
-
+    
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-    	super.onListItemClick(l, v, position, id);
-    	Cursor c = mItemsCursor;
-    	c.moveToPosition(position);
-    	Intent i = new Intent(this, ItemEdit.class);
-    	i.putExtra(ItemsDbAdapter.KEY_ROWID, id);
-    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
-    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
-    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
-    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
-    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
-    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
-    	i.putExtra("intent", "view");
-    	startActivityForResult(i, ACTIVITY_VIEW);
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        Log.w(TAG, "Creating context menu.");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.shopping_list_context, menu);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
     
     @Override
@@ -175,6 +187,7 @@ public class ShoppingList extends ListActivity {
     }
     
     private void fillData() {
+        Log.w(TAG, "Calling fillData");
         // Get all of the notes from the database and create the item list
         mItemsCursor = mDbHelper.fetchAllItems();
         startManagingCursor(mItemsCursor);
@@ -183,18 +196,27 @@ public class ShoppingList extends ListActivity {
         ShoppingListAdapter items =
             new ShoppingListAdapter(this, R.layout.shopping_list_item, mItemsCursor);
         setListAdapter(items);
+        Log.w(TAG, "Ending fillData");
     }
     
     private class ShoppingListAdapter extends ResourceCursorAdapter {
 
 		public ShoppingListAdapter(Context context, int layout, Cursor c) {
 			super(context, layout, c);
+	        Log.w(TAG, "Calling Constructor for ShoppingListAdapter");
 		}
 
 		@Override
 		public void bindView(View view, Context context, final Cursor cursor) {
+	        Log.w(TAG, "Calling bindView");
 			CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
 			TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
+			Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
+			
+			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
+						
+			registerForContextMenu(shoppingListItemButton);
+		    //shoppingListItemButton.setLongClickable(false);
 			
 			shoppingListCheckBox.setChecked(
 					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));
@@ -230,6 +252,14 @@ public class ShoppingList extends ListActivity {
 			    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
 			    	i.putExtra("intent", "view");
 			    	startActivityForResult(i, ACTIVITY_VIEW);
+			    }
+			    
+			});
+			
+			shoppingListItemButton.setOnClickListener(new View.OnClickListener() {
+
+			    public void onClick(View view) {
+			    	openContextMenu(view);
 			    }
 			    
 			});
