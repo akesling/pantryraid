@@ -3,12 +3,11 @@ package us.pantryraid.PantryRaid;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -181,7 +179,7 @@ public class ShoppingList extends ListActivity {
 			if((ovrrd == 0)){
 				//Dialogue: Item already in shopping list
 				AlertDialog.Builder notLockedToListBuilder = new AlertDialog.Builder(this);
-				notLockedToListBuilder.setMessage("Item not locked to shopping list")
+				notLockedToListBuilder.setMessage("Item unlocked from shopping list")
 						.setCancelable(false).setNeutralButton("Okay", new DialogInterface.OnClickListener() {
 					           public void onClick(DialogInterface dialog, int id) {
 					                dialog.cancel();
@@ -269,15 +267,21 @@ public class ShoppingList extends ListActivity {
 		@Override
 		public void bindView(View view, Context context, final Cursor cursor) {
 			Log.w(TAG, "Calling bindView");
-			CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
-			TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
-			Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
-			Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
+			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
+			final int cursorPos = cursor.getPosition();
+			
+			final CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
+			final TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
+			final Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
+			final Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
 
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
 
 			registerForContextMenu(shoppingListItemButton);
 			shoppingListItemButton.setLongClickable(false);
+			
+			double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+			double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
 
 			//Highlight locked items
 			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
@@ -285,23 +289,42 @@ public class ShoppingList extends ListActivity {
 				shoppingListLock.setBackgroundDrawable(
 						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 			} else {
-				shoppingListLock.setBackgroundDrawable(
-						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				if (quantity < threshold) {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+				} else {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				}
 			}
 			
-
-			shoppingListCheckBox.setChecked(
-					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));
+			int itemChecked = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED));
+			shoppingListCheckBox.setChecked((itemChecked!=1? false:true));
+			
 			shoppingListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			
+			/*
+			if(itemChecked == 0) {
+				shoppingListText.setAlpha((float) 0.5);
+				shoppingListText.setPaintFlags(
+						shoppingListText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			}*/
+			
+			shoppingListText.setAlpha((float) (1-0.5*itemChecked));
 
-			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
-			final int cursorPos = cursor.getPosition();
 			shoppingListItemButton.setTag(rowId);
 			
 			shoppingListCheckBox.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
-					mDbHelper.setItemChecked(rowId, ((CheckBox) view).isChecked());
+					boolean itemChecked = ((CheckBox) view).isChecked();
+					mDbHelper.setItemChecked(rowId, itemChecked);
+					
+					if(itemChecked) {
+						shoppingListText.setAlpha((float) 0.5);
+					} else {
+						shoppingListText.setAlpha((float) 1);
+					}
 				}
 
 			});
@@ -311,12 +334,21 @@ public class ShoppingList extends ListActivity {
 				public void onClick(View view) {
 					cursor.moveToPosition(cursorPos);
 					int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+					double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+
 					Log.w(TAG, "Toggled shopLock from: "+toggleState+" At position: "+cursor.getPosition());
 					mDbHelper.toggleShoppingListOverride(rowId, toggleState);
 					
 					if (toggleState==1) {
 						Log.w(TAG, "Turn cart off.");
-						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						if (quantity < threshold) {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+						} else {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						}
 						view.refreshDrawableState();
 						Toast.makeText(mCtx, "Item Unlocked from Shopping List", Toast.LENGTH_SHORT).show();
 						fillData();
@@ -325,6 +357,7 @@ public class ShoppingList extends ListActivity {
 						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 						view.refreshDrawableState();
 						Toast.makeText(mCtx, "Item Locked to Shopping List", Toast.LENGTH_SHORT).show();
+						//XXX: Shouldn't redraw the list every time...
 						fillData();
 					}
 				}

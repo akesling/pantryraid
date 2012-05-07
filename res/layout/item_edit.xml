@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="Type:" />
+        android:text="Item Name:" />
 
     <EditText
         android:id="@+id/itemType"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/itemType"
-        android:text="Store:" />
+        android:text="Preferred Store:" />
 
     <EditText
         android:id="@+id/store"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/store"
-        android:text="Quantity:" />
+        android:text="Current Stock:" />
     
     <EditText
         android:id="@+id/quantity"
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/quantity"
-        android:text="Threshold Quantity:" />
+        android:text="Restock Threshold:" />
     
     <EditText
         android:id="@+id/threshold"
