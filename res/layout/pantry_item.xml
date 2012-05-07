@@ -24,9 +24,10 @@
 	
 	<Button
 	    android:id="@+id/pantryItemContextButton"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
+	    android:layout_width="35dp"
+	    android:layout_height="50dp"
+	    android:layout_marginRight="10dp"
 	    android:layout_alignParentRight="true"
-	    android:text="Menu" />
+	    android:background="@drawable/context_menu_selector" />
 
 </RelativeLayout>
