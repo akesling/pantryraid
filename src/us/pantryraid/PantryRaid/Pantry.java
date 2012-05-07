@@ -63,7 +63,7 @@ public class Pantry extends ListActivity {
 						android.R.layout.simple_spinner_item);
 		actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		bar.setSelectedNavigationItem(0);
-
+ 
 		bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
 
 			@Override
@@ -91,36 +91,43 @@ public class Pantry extends ListActivity {
 		fillData();
 	}
 
+	public void onStart(Bundle savedInstanceState) {
+		
+	}
+
+	public void onResume(Bundle savedInstanceState) {
+
+		super.onResume();
+		mDbHelper.open();
+
+	}
+
 	public void onStop(Bundle savedInstanceState) {
 		mDbHelper.close();
 	}
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 
-		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+		//menu.add(0, INSERT_ID, 0, R.string.menu_insert);
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
+		inflater.inflate(R.menu.pantry_options_menu, menu);
 
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-			SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-			SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-			searchView.setIconifiedByDefault(false);
-		}
+		
 		return result;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case INSERT_ID:
+		case R.id.add_pantry_item:
 			createItem();
 			return true;
-		case R.id.search:
-			onSearchRequested();
-			return true;
+//		case R.id.search:
+//			onSearchRequested();
+//			return true;
 		default:
 			return false;
 		}
@@ -169,29 +176,6 @@ public class Pantry extends ListActivity {
 			           }});
 			confirmDeleteBuilder.create().show();
 			return true;
-		case R.id.lock_item_shoplist:
-			
-			//See if it is already in the shopping list; 
-			//otherwise toggle shopping list override
-			Cursor cursor = mDbHelper.loadItem(selectedWordId);
-			int ovrrd = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
-			int quantity = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
-			long threshold = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
-			
-			if((quantity < threshold) || (ovrrd == 1)){
-				//Dialogue: Item already in shopping list
-				AlertDialog.Builder alreadyInListBuilder = new AlertDialog.Builder(this);
-				alreadyInListBuilder.setMessage("Item is already in the shopping list")
-						.setCancelable(false).setNeutralButton("Okay", new DialogInterface.OnClickListener() {
-					           public void onClick(DialogInterface dialog, int id) {
-					                dialog.cancel();
-					           }
-					       });
-				alreadyInListBuilder.create().show();
-			}else{ mDbHelper.toggleShoppingListOverride(selectedWordId, ovrrd);}	
-			
-			selectedWordId = null;
-			return true;
 		case R.id.item_details:	
 			Intent i = new Intent(this, ItemEdit.class);
 			i.putExtra(ItemsDbAdapter.KEY_ROWID, selectedWordId);
@@ -214,6 +198,7 @@ public class Pantry extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		mDbHelper.open();
 		fillData();
 	}
 

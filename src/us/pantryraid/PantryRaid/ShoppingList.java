@@ -112,10 +112,17 @@ public class ShoppingList extends ListActivity {
 
 	public void onResume(Bundle savedInstanceState) {
 		Log.w(TAG, "Calling onResume");
+		super.onResume();
+		mDbHelper.open();
 		//		ActionBar bar = getActionBar();
 		//		bar.setSelectedNavigationItem(1);
 	}
 
+	public void onPause(){
+		super.onPause();
+		//mDbHelper.close();
+	}
+	
 	public void onStop(Bundle savedInstanceState) {
 		Log.w(TAG, "Calling onStop");
 		mDbHelper.close();
@@ -125,17 +132,12 @@ public class ShoppingList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.w(TAG, "Entering OptionMenu creation.");
 		// boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+		//menu.add(0, INSERT_ID, 0, R.string.menu_insert);
 
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-			SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-			SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-			searchView.setIconifiedByDefault(false);
-		}
+		inflater.inflate(R.menu.shopping_list_options_menu, menu);
+ 
+		
 		Log.w(TAG, "OptionsMenu built.");
 		return true;
 	}
@@ -143,17 +145,7 @@ public class ShoppingList extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.w(TAG, "Calling onOptionsItemSelected");
-		switch (item.getItemId()) {
-		case INSERT_ID:
-			createItem();
-			return true;
-		case R.id.search:
-			onSearchRequested();
-			return true;
-		default:
 			return false;
-
-		}
 	}
 
 	@Override
@@ -170,7 +162,7 @@ public class ShoppingList extends ListActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.shopping_list_context, menu);
 	}
-
+ 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -243,7 +235,7 @@ public class ShoppingList extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-
+		mDbHelper.open();
 		fillData();
 
 	}
@@ -288,11 +280,11 @@ public class ShoppingList extends ListActivity {
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
 
 			registerForContextMenu(shoppingListItemButton);
-			//shoppingListItemButton.setLongClickable(false);
+			shoppingListItemButton.setLongClickable(false);
 			
 			double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
 			double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
-						
+
 			//Highlight locked items
 			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
 			if (toggleState==1) {
