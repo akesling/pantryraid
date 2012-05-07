@@ -277,6 +277,9 @@ public class ShoppingList extends ListActivity {
 		@Override
 		public void bindView(View view, Context context, final Cursor cursor) {
 			Log.w(TAG, "Calling bindView");
+			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
+			final int cursorPos = cursor.getPosition();
+			
 			CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
 			TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
 			Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
@@ -287,15 +290,22 @@ public class ShoppingList extends ListActivity {
 			registerForContextMenu(shoppingListItemButton);
 			//shoppingListItemButton.setLongClickable(false);
 			
-			
+			double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+			double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+						
 			//Highlight locked items
 			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
 			if (toggleState==1) {
 				shoppingListLock.setBackgroundDrawable(
 						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 			} else {
-				shoppingListLock.setBackgroundDrawable(
-						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				if (quantity < threshold) {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+				} else {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				}
 			}
 			
 
@@ -303,8 +313,6 @@ public class ShoppingList extends ListActivity {
 					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));
 			shoppingListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
 
-			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
-			final int cursorPos = cursor.getPosition();
 			shoppingListItemButton.setTag(rowId);
 			
 			shoppingListCheckBox.setOnClickListener(new View.OnClickListener() {
@@ -320,12 +328,21 @@ public class ShoppingList extends ListActivity {
 				public void onClick(View view) {
 					cursor.moveToPosition(cursorPos);
 					int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+					double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+
 					Log.w(TAG, "Toggled shopLock from: "+toggleState+" At position: "+cursor.getPosition());
 					mDbHelper.toggleShoppingListOverride(rowId, toggleState);
 					
 					if (toggleState==1) {
 						Log.w(TAG, "Turn cart off.");
-						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						if (quantity < threshold) {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+						} else {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						}
 						view.refreshDrawableState();
 						Toast.makeText(mCtx, "Item Unlocked from Shopping List", Toast.LENGTH_SHORT).show();
 						fillData();
@@ -334,6 +351,7 @@ public class ShoppingList extends ListActivity {
 						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 						view.refreshDrawableState();
 						Toast.makeText(mCtx, "Item Locked to Shopping List", Toast.LENGTH_SHORT).show();
+						//XXX: Shouldn't redraw the list every time...
 						fillData();
 					}
 				}

@@ -22,5 +22,6 @@
     <string name="item_details">View Item Details</string>
     <string name="update_quantity">Add Quantity Purchased</string>
     <string name="remove_from_shopping_list">Unlock From Shopping List</string>
+    <color name="list_item_pressed">#0099CC</color>
 
 </resources>

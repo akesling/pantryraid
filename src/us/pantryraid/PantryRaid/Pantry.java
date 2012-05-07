@@ -257,13 +257,22 @@ public class Pantry extends ListActivity {
 			registerForContextMenu(pantryItemButton);
 			pantryItemButton.setLongClickable(false);
 			
+			double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+			double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+						
+			//Highlight locked items
 			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
 			if (toggleState==1) {
 				shoppingListLock.setBackgroundDrawable(
 						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 			} else {
-				shoppingListLock.setBackgroundDrawable(
-						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				if (quantity < threshold) {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+				} else {
+					shoppingListLock.setBackgroundDrawable(
+							getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+				}
 			}
 
 			pantryListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
@@ -289,12 +298,21 @@ public class Pantry extends ListActivity {
 				public void onClick(View view) {
 					cursor.moveToPosition(cursorPos);
 					int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					double quantity = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY));
+					double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+
 					Log.w(TAG, "Toggled shopLock from: "+toggleState+" At position: "+cursor.getPosition());
 					mDbHelper.toggleShoppingListOverride(rowId, toggleState);
 					
 					if (toggleState==1) {
 						Log.w(TAG, "Turn cart off.");
-						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						if (quantity < threshold) {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_warning_large));
+						} else {
+							view.setBackgroundDrawable(
+									getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						}
 						view.refreshDrawableState();
 						Toast.makeText(mCtx, "Item Unlocked from Shopping List", Toast.LENGTH_SHORT).show();
 						fillData();
@@ -302,8 +320,8 @@ public class Pantry extends ListActivity {
 						Log.w(TAG, "Turn cart on.");
 						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
 						view.refreshDrawableState();
-						//XXX: Shouldn't redraw the list every time...
 						Toast.makeText(mCtx, "Item Locked to Shopping List", Toast.LENGTH_SHORT).show();
+						//XXX: Shouldn't redraw the list every time...
 						fillData();
 					}
 				}
