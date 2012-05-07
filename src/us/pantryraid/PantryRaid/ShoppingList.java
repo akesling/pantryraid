@@ -112,10 +112,17 @@ public class ShoppingList extends ListActivity {
 
 	public void onResume(Bundle savedInstanceState) {
 		Log.w(TAG, "Calling onResume");
+		super.onResume();
+		mDbHelper.open();
 		//		ActionBar bar = getActionBar();
 		//		bar.setSelectedNavigationItem(1);
 	}
 
+	public void onPause(){
+		super.onPause();
+		//mDbHelper.close();
+	}
+	
 	public void onStop(Bundle savedInstanceState) {
 		Log.w(TAG, "Calling onStop");
 		mDbHelper.close();
@@ -265,6 +272,7 @@ public class ShoppingList extends ListActivity {
 		//    	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
 		//    	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
 		//    	    mDbHelper.createItem(item_type, store, quantity, threshold, last_updated);
+		mDbHelper.open();
 		fillData();
 		//    	    break;
 		//    	case ITEM_SAVED:
@@ -318,7 +326,7 @@ public class ShoppingList extends ListActivity {
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
 
 			registerForContextMenu(shoppingListItemButton);
-			//shoppingListItemButton.setLongClickable(false);
+			shoppingListItemButton.setLongClickable(false);
 
 			shoppingListCheckBox.setChecked(
 					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));

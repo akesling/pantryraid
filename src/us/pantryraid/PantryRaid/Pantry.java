@@ -118,12 +118,19 @@ public class Pantry extends ListActivity {
 	public void onResume(Bundle savedInstanceState) {
 		//        ActionBar bar = getActionBar();
 		// bar.setSelectedNavigationItem(0);
+		super.onResume();
+		mDbHelper.open();
 	}
 
 	public void onStop(Bundle savedInstanceState) {
 		mDbHelper.close();
 	}
 
+	public void onPause(){
+		super.onPause();
+		//mDbHelper.close();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
@@ -241,6 +248,7 @@ public class Pantry extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		mDbHelper.open();
 		//    	Bundle extras = intent.getExtras();
 		//    	
 		//	    String item_type;

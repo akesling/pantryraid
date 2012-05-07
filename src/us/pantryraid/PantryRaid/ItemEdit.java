@@ -160,9 +160,15 @@ protected void onSaveInstanceState(Bundle outState) {
     outState.putSerializable(ItemsDbAdapter.KEY_ROWID, mRowId);
 }
 
+protected void onPause(){
+	super.onPause();
+	mDbHelper.close();
+}
+
 @Override
 protected void onResume() {
     super.onResume();
+    mDbHelper.open();
 //    populateFields();
 }
 
