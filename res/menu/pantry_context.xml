@@ -3,11 +3,8 @@
     <item android:id="@+id/use_item"
           android:title="@string/use_item"
           android:showAsAction="ifRoom"/>
-    <item android:id="@+id/delete_item"
-          android:title="@string/delete_from_pantry" />
-    <item android:id="@+id/add_item_shoplist"
-          android:title="@string/add_item_shoplist" />
-    <item android:id="@+id/item_details"
-          android:title="@string/item_details" />
+    
+    <item android:id="@+id/lock_item_shoplist" android:title="@string/lock_item_shoplist" /><item android:id="@+id/item_details" android:title="@string/item_details" />
+    <item android:id="@+id/delete_item" android:title="@string/delete_item" />
     
 </menu>

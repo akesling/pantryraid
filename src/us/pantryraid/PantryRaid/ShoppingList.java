@@ -1,9 +1,11 @@
 package us.pantryraid.PantryRaid;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
@@ -38,6 +40,7 @@ public class ShoppingList extends ListActivity {
 	private ItemsDbAdapter mDbHelper;
 	//    private Cursor mItemsCursor;
 	private static Context mCtx;
+	private Long selectedItemId;
 
 	// For logging and debugging purposes
 	private static final String TAG = "ShoppingList";
@@ -157,19 +160,77 @@ public class ShoppingList extends ListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
+		
 		Log.w(TAG, "Creating context menu.");
+		View listItemView = (View) v.getParent();
+		selectedItemId = (Long) v.getTag();
+		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.shoppingListText))
+				.getText().toString());
+		
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.shopping_list_context, menu);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		switch (item.getItemId()) {
+		case R.id.update_quantity:
+			//Dialog box with quantity picker?
+			selectedItemId = null;
+			return true;
+		case R.id.remove_from_shopping_list:
+			//How to deal with this? If you simply toggle SL override,
+			//the item may still be a candidate for the shopping list
+			//if quantity is less than threshold.
+			//For now, just toggle override if 1.
+			Cursor cursor = mDbHelper.loadItem(selectedItemId);
+			int ovrrd = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+
+			if((ovrrd == 0)){
+				//Dialogue: Item already in shopping list
+				AlertDialog.Builder notLockedToListBuilder = new AlertDialog.Builder(this);
+				notLockedToListBuilder.setMessage("Item not locked to shopping list")
+						.setCancelable(false).setNeutralButton("Okay", new DialogInterface.OnClickListener() {
+					           public void onClick(DialogInterface dialog, int id) {
+					                dialog.cancel();
+					           }
+					       });
+				notLockedToListBuilder.create().show();
+				//Log.w(TAG, "Already in Shopping List");
+			}else{ 
+				mDbHelper.toggleShoppingListOverride(selectedItemId, ovrrd);
+				fillData();
+			}	
+			
+			selectedItemId = null;
+			return true;
+		case R.id.item_details:
+			Intent i = new Intent(this, ItemEdit.class);
+			i.putExtra(ItemsDbAdapter.KEY_ROWID, selectedItemId);
+			startActivityForResult(i, ACTIVITY_VIEW);
+			selectedItemId = null;
+			return true;
+		case R.id.delete_item:
+			AlertDialog.Builder confirmDeleteBuilder = new AlertDialog.Builder(this);
+			confirmDeleteBuilder.setMessage("Are you sure you want to delete this item?")
+					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+					           public void onClick(DialogInterface dialog, int id) {
+					                mDbHelper.deleteItem(selectedItemId);
+					                selectedItemId = null;
+					                fillData();
+					           }})
+		           .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                dialog.cancel();
+			                selectedItemId = null;
+			           }});
+			confirmDeleteBuilder.create().show();
+			return true;
 		default:
 			return super.onContextItemSelected(item);
 		}
 	}
+	
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		//    	Cursor c = mItemsCursor;
@@ -270,7 +331,8 @@ public class ShoppingList extends ListActivity {
 
 			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
 			final int cursorPos = cursor.getPosition();
-
+			shoppingListItemButton.setTag(rowId);
+			
 			shoppingListCheckBox.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {

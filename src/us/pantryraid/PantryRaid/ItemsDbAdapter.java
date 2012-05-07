@@ -160,6 +160,7 @@ public class ItemsDbAdapter {
 		initialValues.put(KEY_QUANTITY, quantity);
 		initialValues.put(KEY_THRESHOLD, threshold);
 		initialValues.put(KEY_LAST_UPDATED, last_updated);
+		initialValues.put(KEY_SHOPLIST_OVERRIDE, 0);
 
 		return mDb.insert(DATABASE_TABLE, null, initialValues);
 	}

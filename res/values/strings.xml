@@ -16,11 +16,11 @@
         <item>Shopping List</item>
     </string-array>
 
-    <string name="delete_from_pantry">Remove Item from Pantry</string>
+    <string name="delete_item">Delete Item</string>
     <string name="use_item">Use Some of This Item</string>
-    <string name="add_item_shoplist">Add To Shopping List</string>
+    <string name="lock_item_shoplist">Lock To Shopping List</string>
     <string name="item_details">View Item Details</string>
-    <string name="add_item_pantry">Add Quantity Purchased</string>
-    <string name="delete_from_shopping_list">Remove From Shopping List</string>
+    <string name="update_quantity">Add Quantity Purchased</string>
+    <string name="remove_from_shopping_list">Unlock From Shopping List</string>
 
 </resources>

@@ -207,7 +207,7 @@ public class Pantry extends ListActivity {
 			           }});
 			confirmDeleteBuilder.create().show();
 			return true;
-		case R.id.add_item_shoplist:
+		case R.id.lock_item_shoplist:
 			
 			//See if it is already in the shopping list; 
 			//otherwise toggle shopping list override
