@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -233,58 +232,19 @@ public class ShoppingList extends ListActivity {
 	
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		//    	Cursor c = mItemsCursor;
-		//    	c.moveToPosition(position);
+
 		Intent i = new Intent(this, ItemEdit.class);
 		i.putExtra(ItemsDbAdapter.KEY_ROWID, id);
-		//    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
-		//    	i.putExtra("intent", "view");
+
 		startActivityForResult(i, ACTIVITY_VIEW);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		//    	Bundle extras = intent.getExtras();
-		//    	
-		//	    String item_type;
-		//	    String store;
-		//	    Double quantity;
-		//	    Double threshold;
-		//	    Long last_updated;
-		//
-		//    	switch(extras.getInt(RETURN_ACTION)) {
-		//    	case ITEM_CANCELLED:
-		//    	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-		//    	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-		//    	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-		//    	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-		//    	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-		//    	    mDbHelper.createItem(item_type, store, quantity, threshold, last_updated);
+
 		fillData();
-		//    	    break;
-		//    	case ITEM_SAVED:
-		//    	    Long mRowId = extras.getLong(ItemsDbAdapter.KEY_ROWID);
-		//    	    if (mRowId != null) {
-		//        	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-		//        	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-		//        	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-		//        	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-		//        	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-		//        	    mDbHelper.updateItem(mRowId, item_type, store, quantity, threshold, last_updated);
-		//    	    }
-		//    	    fillData();
-		//    	    break;
-		//    	}
+
 	}
 
 	private void createItem() {
@@ -318,12 +278,25 @@ public class ShoppingList extends ListActivity {
 			Log.w(TAG, "Calling bindView");
 			CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
 			TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
+			Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
 			Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
 
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
 
 			registerForContextMenu(shoppingListItemButton);
 			//shoppingListItemButton.setLongClickable(false);
+			
+			
+			//Highlight locked items
+			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+			if (toggleState==1) {
+				shoppingListLock.setBackgroundDrawable(
+						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
+			} else {
+				shoppingListLock.setBackgroundDrawable(
+						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+			}
+			
 
 			shoppingListCheckBox.setChecked(
 					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));
@@ -337,6 +310,29 @@ public class ShoppingList extends ListActivity {
 
 				public void onClick(View view) {
 					mDbHelper.setItemChecked(rowId, ((CheckBox) view).isChecked());
+				}
+
+			});
+			
+			shoppingListLock.setOnClickListener(new View.OnClickListener() {
+
+				public void onClick(View view) {
+					cursor.moveToPosition(cursorPos);
+					int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					Log.w(TAG, "Toggled shopLock from: "+toggleState+" At position: "+cursor.getPosition());
+					mDbHelper.toggleShoppingListOverride(rowId, toggleState);
+					
+					if (toggleState==1) {
+						Log.w(TAG, "Turn cart off.");
+						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						view.refreshDrawableState();
+						fillData();
+					} else {
+						Log.w(TAG, "Turn cart on.");
+						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
+						view.refreshDrawableState();
+						fillData();
+					}
 				}
 
 			});
