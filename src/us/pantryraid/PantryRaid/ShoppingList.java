@@ -125,10 +125,10 @@ public class ShoppingList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.w(TAG, "Entering OptionMenu creation.");
 		// boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+		//menu.add(0, INSERT_ID, 0, R.string.menu_insert);
 
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
+		inflater.inflate(R.menu.shopping_list_options_menu, menu);
 
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 			SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);

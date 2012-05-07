@@ -59,7 +59,7 @@ public class ItemsDbAdapter {
 
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE = "items";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 
 	private final Context mCtx;
@@ -81,33 +81,34 @@ public class ItemsDbAdapter {
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS items");
+					+ newVersion + ", while not trying to preserve old data");
+			
+//			db.execSQL(
+//				//	"BEGIN TRANSACTION;" +
+//					" CREATE TEMPORARY TABLE " +
+//					"backup(_id integer primary key autoincrement, " +
+//					"item_type text not null, " +
+//					"store text," +
+//					"quantity real not null, " +
+//					"threshold real," +
+//					"checked boolean default 0 not null, " +
+//					"last_updated integer not null, " + 
+//					"shop_list_override boolean default 0 not null);" +
+//					" INSERT INTO backup SELECT " +  KEY_ROWID + ", " + KEY_ITEM_TYPE +
+//					", " + KEY_STORE + ", " + KEY_QUANTITY + ", " + KEY_THRESHOLD + ", " + 
+//					KEY_CHECKED + ", " + KEY_LAST_UPDATED + ", " + KEY_SHOPLIST_OVERRIDE  + 
+//					" FROM " + DATABASE_TABLE + ";" + " DROP TABLE " + DATABASE_TABLE + ";");
+//			
+			db.execSQL("DROP TABLE " + DATABASE_TABLE + ";");
 			onCreate(db);
+			
+//			db.execSQL(" INSERT INTO " + DATABASE_TABLE + " SELECT * FROM backup;" +
+//					" DROP TABLE backup;" +
+//					" COMMIT;");
 		}
 	}
 
-	public void changeDatabase(){
-		Log.w(TAG, "Altering table.");
-		//For refactoring database
-		mDb.execSQL( "BEGIN TRANSACTION;" +
-		" CREATE TEMPORARY TABLE backup(_id integer primary key autoincrement, " +
-					"item_type text not null, " +
-					"store text," +
-					"quantity real not null, " +
-					"threshold real," +
-					"checked boolean default 0 not null, " +
-					"last_updated integer not null, " + 
-					"shop_list_override boolean default 0 not null);" +
-		" INSERT INTO backup SELECT " +  KEY_ROWID + ", " + KEY_ITEM_TYPE +
-		", " + KEY_STORE + ", " + KEY_QUANTITY + ", " + KEY_THRESHOLD + ", " + 
-		KEY_CHECKED + ", " + KEY_LAST_UPDATED + ", " + KEY_SHOPLIST_OVERRIDE  + " FROM " + DATABASE_TABLE + ";" +
-		" DROP TABLE " + DATABASE_TABLE + ";" +
-		DATABASE_CREATE +
-		" INSERT INTO " + DATABASE_TABLE + " SELECT * FROM backup;" +
-		" DROP TABLE backup;" +
-		" COMMIT;");
-	}
+	
 	/**
 	 * Constructor - takes the context to allow the database to be
 	 * opened/created
