@@ -15,13 +15,11 @@
 	
 	<Button
 	    android:id="@+id/pantryItemShoplistLock"
-	    android:layout_width="14dip"
-	    android:layout_height="14dip"
-	   	android:padding="20dp"
-	   	android:layout_marginRight="10dp"
+	    android:layout_width="40dip"
+	    android:layout_height="40dip"
 	    android:layout_centerVertical="true"
 	    android:layout_toLeftOf="@+id/pantryItemContextButton"
-	    android:background="@drawable/glyphicons_202_shopping_cart_white"
+	    android:background="@drawable/glyphicons_202_shopping_cart_passive_large"
 	    android:gravity="center_vertical|center_horizontal"/>
 	
 	<Button

@@ -22,6 +22,15 @@
 	</TextView>
 	
 	<Button
+	    android:id="@+id/shoppingListLock"
+	    android:layout_width="40dip"
+	    android:layout_height="40dip"
+	    android:layout_centerVertical="true"
+	    android:layout_toLeftOf="@+id/shoppingListItemContextButton"
+	    android:background="@drawable/glyphicons_202_shopping_cart_passive_large"
+	    android:gravity="center_vertical|center_horizontal"/>
+	
+	<Button
 	    android:id="@+id/shoppingListItemContextButton"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"

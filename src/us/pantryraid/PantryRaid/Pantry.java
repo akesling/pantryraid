@@ -17,15 +17,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.SearchView;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 
@@ -34,14 +32,11 @@ public class Pantry extends ListActivity {
 	private static final int ACTIVITY_VIEW=1;
 
 	private ItemsDbAdapter mDbHelper;
-	//    private Cursor mItemsCursor;
 	private static Context mCtx;
 
 	// For logging and debugging purposes
 	private static final String TAG = "Pantry";
 	public static final int INSERT_ID = Menu.FIRST;
-	//    private int mItemNumber = 1;
-	//	private String selectedWord;
 	private Long selectedWordId;
 
 	//XXX: Flag such that callbacks don't get called on first instantiation.
@@ -75,11 +70,6 @@ public class Pantry extends ListActivity {
 			public boolean onNavigationItemSelected(int itemPosition,
 					long itemId) {
 
-				//                if (onCreateFlag) {
-				//                    onCreateFlag = false;
-				//                    return true;
-				//                }
-
 				Log.w(TAG, "Item "+itemPosition+" selected.");
 
 				switch(itemPosition) {
@@ -92,14 +82,6 @@ public class Pantry extends ListActivity {
 			}
 
 		});
-		//        
-		//        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionbar_view_select,
-		//        		android.R.layout.simple_spinner_dropdown_item);
-		//        
-
-
-
-
 
 		setContentView(R.layout.pantry_list);
 
@@ -107,29 +89,23 @@ public class Pantry extends ListActivity {
 		mDbHelper = new ItemsDbAdapter(this);
 		mDbHelper.open();
 		fillData();
-		//mDbHelper.close();
 	}
 
 	public void onStart(Bundle savedInstanceState) {
-		//        ActionBar bar = getActionBar();
-		//bar.setSelectedNavigationItem(0);
+		
 	}
 
 	public void onResume(Bundle savedInstanceState) {
-		//        ActionBar bar = getActionBar();
-		// bar.setSelectedNavigationItem(0);
+
 		super.onResume();
 		mDbHelper.open();
+
 	}
 
 	public void onStop(Bundle savedInstanceState) {
 		mDbHelper.close();
 	}
 
-	public void onPause(){
-		super.onPause();
-		//mDbHelper.close();
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,9 +125,9 @@ public class Pantry extends ListActivity {
 		case R.id.add_pantry_item:
 			createItem();
 			return true;
-		case R.id.search:
-			onSearchRequested();
-			return true;
+//		case R.id.search:
+//			onSearchRequested();
+//			return true;
 		default:
 			return false;
 		}
@@ -165,12 +141,6 @@ public class Pantry extends ListActivity {
 
 		View listItemView = (View) v.getParent();
 
-
-		//		Log.w(TAG, "the views class is '" + v.getParent().getClass() + "'.");
-
-		//		AdapterContextMenuInfo info =
-		//				(AdapterContextMenuInfo) menuInfo;
-		//	    String selectedWord = ((TextView) info.targetView.findViewById(android.R.id.title)).getText().toString();
 		selectedWordId = (Long) v.getTag();
 		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.pantryItemText))
 				.getText().toString());
@@ -183,9 +153,6 @@ public class Pantry extends ListActivity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-//		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		//		String selectedWord = ((TextView) info.targetView.findViewById(android.R.id.title)).getText().toString();
-		//	    long selectedWordId = info.id;
 		switch (item.getItemId()) {
 		case R.id.use_item:
 			//Decrease Quantity?
@@ -220,28 +187,11 @@ public class Pantry extends ListActivity {
 		}
 	}
 
-	//	private void addItemToShoppingList(Long selectedWordId2) {
-	//			ItemsDbAdapter.
-	//	}
-
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		//    	Cursor c = mItemsCursor;
-		//    	c.moveToPosition(position);
 		Intent i = new Intent(this, ItemEdit.class);
 		i.putExtra(ItemsDbAdapter.KEY_ROWID, id);
-		//    	i.putExtra(ItemsDbAdapter.KEY_ITEM_TYPE, c.getString(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_ITEM_TYPE)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_STORE, c.getString(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_STORE)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_QUANTITY, c.getDouble(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_QUANTITY)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_THRESHOLD, c.getDouble(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_THRESHOLD)));
-		//    	i.putExtra(ItemsDbAdapter.KEY_LAST_UPDATED, c.getLong(
-		//    	        c.getColumnIndexOrThrow(ItemsDbAdapter.KEY_LAST_UPDATED)));
-		//    	i.putExtra("intent", "view");
 		startActivityForResult(i, ACTIVITY_VIEW);
 	}
 
@@ -249,37 +199,7 @@ public class Pantry extends ListActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 		mDbHelper.open();
-		//    	Bundle extras = intent.getExtras();
-		//    	
-		//	    String item_type;
-		//	    String store;
-		//	    Double quantity;
-		//	    Double threshold;
-		//	    Long last_updated;
-		//
-		//    	switch(requestCode) {
-		//    	case ACTIVITY_CREATE:
-		//    	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-		//    	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-		//    	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-		//    	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-		//    	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-		//    	    mDbHelper.createItem(item_type, store, quantity, threshold, last_updated);
 		fillData();
-		//    	    break;
-		//    	case ACTIVITY_VIEW:
-		//    	    Long mRowId = extras.getLong(ItemsDbAdapter.KEY_ROWID);
-		//    	    if (mRowId != null) {
-		//        	    item_type = extras.getString(ItemsDbAdapter.KEY_ITEM_TYPE);
-		//        	    store = extras.getString(ItemsDbAdapter.KEY_STORE);
-		//        	    quantity = extras.getDouble(ItemsDbAdapter.KEY_QUANTITY);
-		//        	    threshold = extras.getDouble(ItemsDbAdapter.KEY_THRESHOLD);
-		//        	    last_updated = extras.getLong(ItemsDbAdapter.KEY_LAST_UPDATED);
-		//        	    mDbHelper.updateItem(mRowId, item_type, store, quantity, threshold, last_updated);
-		//    	    }
-		//    	    fillData();
-		//    	    break;
-		//    	}
 	}
 
 	private void createItem() {
@@ -317,18 +237,25 @@ public class Pantry extends ListActivity {
 		public void bindView(View view, Context context, final Cursor cursor) {
 			TextView pantryListText = (TextView)view.findViewById(R.id.pantryItemText);
 			Button pantryItemButton = (Button)view.findViewById(R.id.pantryItemContextButton);
-			//			Log.w(TAG, "the views class is '" + view.getClass() + "'.");
-
+			Button shoppingListLock = (Button)view.findViewById(R.id.pantryItemShoplistLock);
+			
 			registerForContextMenu(pantryItemButton);
-			//			registerForContextMenu(view);
-
 			pantryItemButton.setLongClickable(false);
-
+			
+			int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+			if (toggleState==1) {
+				shoppingListLock.setBackgroundDrawable(
+						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
+			} else {
+				shoppingListLock.setBackgroundDrawable(
+						getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+			}
 
 			pantryListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
 
 			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
-			//			final int cursorPos = cursor.getPosition();
+			final int cursorPos = cursor.getPosition();
+
 			//This embeds the pantry items rowId into the button so context menus can access them.
 			pantryItemButton.setTag(rowId);
 
@@ -338,6 +265,32 @@ public class Pantry extends ListActivity {
 					Intent i = new Intent(mCtx, ItemEdit.class);
 					i.putExtra(ItemsDbAdapter.KEY_ROWID, rowId);
 					startActivityForResult(i, ACTIVITY_VIEW);
+				}
+
+			});
+			
+			shoppingListLock.setOnClickListener(new View.OnClickListener() {
+
+				public void onClick(View view) {
+					cursor.moveToPosition(cursorPos);
+					int toggleState = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					Log.w(TAG, "Toggled shopLock from: "+toggleState+" At position: "+cursor.getPosition());
+					mDbHelper.toggleShoppingListOverride(rowId, toggleState);
+					
+					if (toggleState==1) {
+						Log.w(TAG, "Turn cart off.");
+						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_passive_large));
+						view.refreshDrawableState();
+						Toast.makeText(mCtx, "Item Unlocked from Shopping List", Toast.LENGTH_SHORT).show();
+						fillData();
+					} else {
+						Log.w(TAG, "Turn cart on.");
+						view.setBackgroundDrawable(getResources().getDrawable(R.drawable.glyphicons_202_shopping_cart_active_large));
+						view.refreshDrawableState();
+						//XXX: Shouldn't redraw the list every time...
+						Toast.makeText(mCtx, "Item Locked to Shopping List", Toast.LENGTH_SHORT).show();
+						fillData();
+					}
 				}
 
 			});
