@@ -129,13 +129,8 @@ public class ShoppingList extends ListActivity {
 
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.shopping_list_options_menu, menu);
-
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-			SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-			SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-			searchView.setIconifiedByDefault(false);
-		}
+ 
+		
 		Log.w(TAG, "OptionsMenu built.");
 		return true;
 	}
@@ -170,7 +165,7 @@ public class ShoppingList extends ListActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.shopping_list_context, menu);
 	}
-
+ 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

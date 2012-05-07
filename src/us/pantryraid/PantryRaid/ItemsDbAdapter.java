@@ -284,7 +284,7 @@ public class ItemsDbAdapter {
 			mDb.update(DATABASE_TABLE, cv, KEY_ROWID + " = " + rowId, null);
 			
 		}else{
-			//Throw error.
+			//throw new InvalidQuantityException();
 		}
 		
 	}
