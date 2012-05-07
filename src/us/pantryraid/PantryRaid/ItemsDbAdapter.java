@@ -59,7 +59,7 @@ public class ItemsDbAdapter {
 
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE = "items";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 
 	private final Context mCtx;

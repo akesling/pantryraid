@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/update_quantity" android:title="@string/update_quantity" /><item android:id="@+id/remove_from_shopping_list" android:title="@string/remove_from_shopping_list"></item><item android:id="@+id/item_details" android:title="@string/item_details" /><item android:id="@+id/delete_item"
+    <item android:id="@+id/update_quantity"
+          android:title="@string/update_quantity" />
+    <item android:id="@+id/remove_from_shopping_list"
+          android:title="@string/remove_from_shopping_list" />
+    <item android:id="@+id/item_details" 
+          android:title="@string/item_details" />
+    <item android:id="@+id/delete_item"
           android:title="@string/delete_item"
           android:showAsAction="ifRoom"/>
-    
-    
-    
 </menu>
