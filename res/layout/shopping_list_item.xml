@@ -13,12 +13,15 @@
     
 	<TextView
 	    android:id="@+id/shoppingListText"
-	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
+	    android:layout_width="fill_parent"
 	    android:padding="5dp"
 	    android:paddingLeft="10dp"
 	    android:layout_toRightOf="@+id/shoppingListCheckbox"
-	    android:textSize="16sp" >
+	    android:layout_toLeftOf="@+id/shoppingListLock"
+	    android:textSize="16sp"
+	    android:ellipsize="end"
+	    android:singleLine="true">
 	</TextView>
 	
 	<Button

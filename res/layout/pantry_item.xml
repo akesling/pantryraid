@@ -12,6 +12,9 @@
 	    android:textSize="16sp"
 		android:layout_centerVertical="true"
 	    android:layout_alignParentLeft="true"
+	    android:layout_toLeftOf="@+id/pantryItemShoplistLock"
+	    android:ellipsize="end"
+	    android:singleLine="true"
 	    >
 	</TextView>
 	

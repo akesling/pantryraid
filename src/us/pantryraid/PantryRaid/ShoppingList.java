@@ -3,12 +3,11 @@ package us.pantryraid.PantryRaid;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -181,7 +179,7 @@ public class ShoppingList extends ListActivity {
 			if((ovrrd == 0)){
 				//Dialogue: Item already in shopping list
 				AlertDialog.Builder notLockedToListBuilder = new AlertDialog.Builder(this);
-				notLockedToListBuilder.setMessage("Item not locked to shopping list")
+				notLockedToListBuilder.setMessage("Item unlocked from shopping list")
 						.setCancelable(false).setNeutralButton("Okay", new DialogInterface.OnClickListener() {
 					           public void onClick(DialogInterface dialog, int id) {
 					                dialog.cancel();
@@ -272,10 +270,10 @@ public class ShoppingList extends ListActivity {
 			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
 			final int cursorPos = cursor.getPosition();
 			
-			CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
-			TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
-			Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
-			Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
+			final CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
+			final TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
+			final Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
+			final Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
 
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
 
@@ -300,17 +298,33 @@ public class ShoppingList extends ListActivity {
 				}
 			}
 			
-
-			shoppingListCheckBox.setChecked(
-					(cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED))==0? false:true));
+			int itemChecked = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED));
+			shoppingListCheckBox.setChecked((itemChecked!=1? false:true));
+			
 			shoppingListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			
+			/*
+			if(itemChecked == 0) {
+				shoppingListText.setAlpha((float) 0.5);
+				shoppingListText.setPaintFlags(
+						shoppingListText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			}*/
+			
+			shoppingListText.setAlpha((float) (1-0.5*itemChecked));
 
 			shoppingListItemButton.setTag(rowId);
 			
 			shoppingListCheckBox.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
-					mDbHelper.setItemChecked(rowId, ((CheckBox) view).isChecked());
+					boolean itemChecked = ((CheckBox) view).isChecked();
+					mDbHelper.setItemChecked(rowId, itemChecked);
+					
+					if(itemChecked) {
+						shoppingListText.setAlpha((float) 0.5);
+					} else {
+						shoppingListText.setAlpha((float) 1);
+					}
 				}
 
 			});
