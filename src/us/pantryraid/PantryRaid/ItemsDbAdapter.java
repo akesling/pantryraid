@@ -248,16 +248,17 @@ public class ItemsDbAdapter {
 	}
 
 	public Cursor loadPantryItems() {
-
+		Log.w(TAG, "Loading Pantry Items");
+		//mDb.rawQuery("Select * from " + DATABASE_TABLE + " WHERE " + KEY_QUANTITY + " ", selectionArgs)
 		return mDb.query(DATABASE_TABLE, ALL_COLUMNS, 
-				KEY_QUANTITY + " > 0;", null, null, null, null);
+				"(" + KEY_QUANTITY + " > 0)", null, null, null, KEY_ITEM_TYPE + " COLLATE NOCASE;");
 	}
 
 	public Cursor loadShoppingListItems() {
 		return mDb.query(DATABASE_TABLE, ALL_COLUMNS, 
 				"(" + KEY_QUANTITY + " < " + KEY_THRESHOLD + 
-				") OR (" + KEY_SHOPLIST_OVERRIDE + " = " + "1);", 
-				null, null, null, null);
+				") OR (" + KEY_SHOPLIST_OVERRIDE + " = " + "1)", 
+				null, null, null, KEY_ITEM_TYPE + " COLLATE NOCASE;");
 	}
 
 	public void toggleShoppingListOverride(Long itemID, int currentValue) {

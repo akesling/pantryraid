@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ItemEdit extends Activity {
 	private Long mRowId;
@@ -189,6 +190,8 @@ public class ItemEdit extends Activity {
 					invalidThresholdBuilder.create().show();
 				}else{
 					saveState();
+					mDbHelper.close();
+					Toast.makeText(this, "Item Saved", Toast.LENGTH_SHORT).show();
 					setResult(RESULT_OK);//, mIntent);
 					finish();
 				}

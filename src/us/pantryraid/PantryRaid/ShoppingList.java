@@ -293,6 +293,9 @@ public class ShoppingList extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		if(resultCode == RESULT_OK){
+			Toast.makeText(this, "Item Saved.", Toast.LENGTH_SHORT);
+		}
 		mDbHelper.open();
 		fillData();
 
