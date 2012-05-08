@@ -142,7 +142,7 @@ public class Pantry extends ListActivity {
 		View listItemView = (View) v.getParent();
 
 		selectedWordId = (Long) v.getTag();
-		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.pantryItemText))
+		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.pantryItemName))
 				.getText().toString());
 
 
@@ -235,7 +235,8 @@ public class Pantry extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, final Cursor cursor) {
-			TextView pantryListText = (TextView)view.findViewById(R.id.pantryItemText);
+			TextView pantryItemName = (TextView)view.findViewById(R.id.pantryItemName);
+			TextView pantryItemQuantity = (TextView)view.findViewById(R.id.pantryItemQuantity);
 			Button pantryItemButton = (Button)view.findViewById(R.id.pantryItemContextButton);
 			Button shoppingListLock = (Button)view.findViewById(R.id.pantryItemShoplistLock);
 			
@@ -260,7 +261,8 @@ public class Pantry extends ListActivity {
 				}
 			}
 
-			pantryListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			pantryItemName.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			pantryItemQuantity.setText("Current Stock: " + cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY)));
 
 			final long rowId = cursor.getLong(cursor.getColumnIndex(ItemsDbAdapter.KEY_ROWID));
 			final int cursorPos = cursor.getPosition();
@@ -268,7 +270,7 @@ public class Pantry extends ListActivity {
 			//This embeds the pantry items rowId into the button so context menus can access them.
 			pantryItemButton.setTag(rowId);
 
-			pantryListText.setOnClickListener(new View.OnClickListener() {
+			view.findViewById(R.id.pantryItemText).setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
 					Intent i = new Intent(mCtx, ItemEdit.class);

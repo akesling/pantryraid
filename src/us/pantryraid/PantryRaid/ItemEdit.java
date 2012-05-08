@@ -158,7 +158,7 @@ public class ItemEdit extends Activity {
 					dialog.cancel();
 				}});
 			noNameBuilder.create().show();
-
+ 
 		}else{
 			if(( mQuantityText.getText().toString().equals( "")) ){
 

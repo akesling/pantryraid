@@ -154,7 +154,7 @@ public class ShoppingList extends ListActivity {
 		Log.w(TAG, "Creating context menu.");
 		View listItemView = (View) v.getParent();
 		selectedItemId = (Long) v.getTag();
-		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.shoppingListText))
+		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.shoppingListName))
 				.getText().toString());
 		
 		MenuInflater inflater = getMenuInflater();
@@ -271,12 +271,12 @@ public class ShoppingList extends ListActivity {
 			final int cursorPos = cursor.getPosition();
 			
 			final CheckBox shoppingListCheckBox = (CheckBox)view.findViewById(R.id.shoppingListCheckbox);
-			final TextView shoppingListText = (TextView)view.findViewById(R.id.shoppingListText);
+			final TextView shoppingListName = (TextView)view.findViewById(R.id.shoppingListName);
+			final TextView shoppingListQuantity = (TextView)view.findViewById(R.id.shoppingListQuantity);
 			final Button shoppingListLock = (Button)view.findViewById(R.id.shoppingListLock);
 			final Button shoppingListItemButton = (Button)view.findViewById(R.id.shoppingListItemContextButton);
 
 			Log.w(TAG, "Creating button... is it null?: "+(shoppingListItemButton == null));
-
 			registerForContextMenu(shoppingListItemButton);
 			shoppingListItemButton.setLongClickable(false);
 			
@@ -301,7 +301,9 @@ public class ShoppingList extends ListActivity {
 			int itemChecked = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_CHECKED));
 			shoppingListCheckBox.setChecked((itemChecked!=1? false:true));
 			
-			shoppingListText.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			shoppingListName.setText(cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_ITEM_TYPE)));
+			shoppingListQuantity.setText("Current Stock: " + cursor.getString(cursor.getColumnIndex(ItemsDbAdapter.KEY_QUANTITY)));
+
 			
 			/*
 			if(itemChecked == 0) {
@@ -310,7 +312,8 @@ public class ShoppingList extends ListActivity {
 						shoppingListText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			}*/
 			
-			shoppingListText.setAlpha((float) (1-0.5*itemChecked));
+			shoppingListName.setAlpha((float) (1-0.5*itemChecked));
+			shoppingListQuantity.setAlpha((float) (1-0.5*itemChecked));
 
 			shoppingListItemButton.setTag(rowId);
 			
@@ -321,9 +324,11 @@ public class ShoppingList extends ListActivity {
 					mDbHelper.setItemChecked(rowId, itemChecked);
 					
 					if(itemChecked) {
-						shoppingListText.setAlpha((float) 0.5);
+						shoppingListName.setAlpha((float) 0.5);
+						shoppingListQuantity.setAlpha((float) 0.5);
 					} else {
-						shoppingListText.setAlpha((float) 1);
+						shoppingListName.setAlpha((float) 1);
+						shoppingListQuantity.setAlpha((float) 1);
 					}
 				}
 
@@ -364,7 +369,7 @@ public class ShoppingList extends ListActivity {
 
 			});
 
-			shoppingListText.setOnClickListener(new View.OnClickListener() {
+			view.findViewById(R.id.shoppingListText).setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
 					Cursor c = cursor;
