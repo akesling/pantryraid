@@ -275,7 +275,7 @@ public class ItemsDbAdapter {
 		
 		Cursor cursor = mDb.query(DATABASE_TABLE, new String[]{KEY_QUANTITY}, 
 				KEY_ROWID + " = " + rowId, null, null, null, null);
-		cursor.moveToFirst();
+		cursor.moveToFirst(); 
 		long currentQuantity = cursor.getLong(cursor.getColumnIndex(KEY_QUANTITY)) ;
 		
 		if (currentQuantity >= 1){
@@ -287,6 +287,17 @@ public class ItemsDbAdapter {
 			//throw new InvalidQuantityException();
 		}
 		
+	}
+
+	public void addQuantityToItem(long rowId, double addition) {
+		Cursor cursor = mDb.query(DATABASE_TABLE, new String[]{KEY_QUANTITY}, 
+				KEY_ROWID + " = " + rowId, null, null, null, null);
+		cursor.moveToFirst();
+		long currentQuantity = cursor.getLong(cursor.getColumnIndex(KEY_QUANTITY)) ;
+		
+		ContentValues cv = new ContentValues();
+		cv.put(KEY_QUANTITY, (currentQuantity + addition));
+		mDb.update(DATABASE_TABLE, cv, KEY_ROWID + " = " + rowId, null);
 	}
 
 }

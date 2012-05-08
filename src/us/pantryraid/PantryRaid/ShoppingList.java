@@ -7,18 +7,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -165,8 +167,43 @@ public class ShoppingList extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.update_quantity:
-			//Dialog box with quantity picker?
-			selectedItemId = null;
+			LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+			View layout = inflater.inflate(R.layout.entry_dialog,
+			                               (ViewGroup) findViewById(R.id.layout_root));
+
+			final EditText text = (EditText) layout.findViewById(R.id.value);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setView(layout);
+			
+			builder.setMessage("Enter Numeric Quantity:");
+			
+			builder.setPositiveButton("Add to Pantry", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					String input = text.getText().toString();
+					Double addition = 0.0;
+					if (input != null && !input.equals("")) {
+						addition = Double.parseDouble(input);
+					}
+					
+	                mDbHelper.addQuantityToItem(selectedItemId, addition);
+	        	    
+					dialog.cancel();
+					
+	                selectedItemId = null;
+	                fillData();
+	           	}});
+		    
+		    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		    
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		dialog.cancel();
+			        selectedItemId = null;
+			    }
+			           
+		    });
+			
+			builder.create().show();
 			return true;
 		case R.id.remove_from_shopping_list:
 			//How to deal with this? If you simply toggle SL override,
