@@ -50,6 +50,7 @@ public class Pantry extends ListActivity {
 
 		ActionBar bar = getActionBar();
 		bar.setDisplayShowTitleEnabled(false);
+		
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
 		Log.w(TAG, "Creating array adapter.");
@@ -62,7 +63,7 @@ public class Pantry extends ListActivity {
 				ArrayAdapter.createFromResource(this, R.array.actionbar_view_select, 
 						android.R.layout.simple_spinner_item);
 		actionBarSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		bar.setSelectedNavigationItem(0);
+		
  
 		bar.setListNavigationCallbacks(actionBarSpinner, new ActionBar.OnNavigationListener() {
 
@@ -82,7 +83,7 @@ public class Pantry extends ListActivity {
 			}
 
 		});
-
+		bar.setSelectedNavigationItem(0);
 		setContentView(R.layout.pantry_list);
 
 		Log.w(TAG, "Hello "+TAG+".");

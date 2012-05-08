@@ -93,6 +93,8 @@ public class ShoppingList extends ListActivity {
 		});
 
 		bar.setSelectedNavigationItem(1);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		Log.w(TAG, "Navigation callback set.");
 
 		//Populate list
