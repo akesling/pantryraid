@@ -9,20 +9,39 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
+	    android:layout_centerVertical="true"
 	    android:checked="false" />
     
-	<TextView
+	<LinearLayout
 	    android:id="@+id/shoppingListText"
-	    android:layout_height="fill_parent"
 	    android:layout_width="fill_parent"
-	    android:padding="5dp"
-	    android:paddingLeft="10dp"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical"
+	    android:layout_centerVertical="true"
 	    android:layout_toRightOf="@+id/shoppingListCheckbox"
-	    android:layout_toLeftOf="@+id/shoppingListLock"
-	    android:textSize="16sp"
-	    android:ellipsize="end"
-	    android:singleLine="true">
-	</TextView>
+		android:layout_toLeftOf="@+id/shoppingListLock"
+	    >
+	    <TextView
+		    android:id="@+id/shoppingListName"
+		    android:layout_height="fill_parent"
+		    android:layout_width="fill_parent"
+		    android:paddingTop="5dp"
+		    android:paddingLeft="10dp"
+		    android:textSize="16sp"
+		    android:ellipsize="end"
+		    android:singleLine="true">
+		</TextView>
+		<TextView
+		    android:id="@+id/shoppingListQuantity"
+		    android:layout_height="fill_parent"
+		    android:layout_width="fill_parent"
+		    android:paddingBottom="5dp"
+		    android:paddingLeft="15dp"
+		    android:textSize="12sp"
+		    android:ellipsize="end"
+		    android:singleLine="true">
+		</TextView>
+	</LinearLayout>
 	
 	<Button
 	    android:id="@+id/shoppingListLock"
@@ -35,8 +54,10 @@
 	
 	<Button
 	    android:id="@+id/shoppingListItemContextButton"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
+	    android:layout_width="35dp"
+	    android:layout_height="50dp"
+	    android:layout_marginRight="10dp"
 	    android:layout_alignParentRight="true"
-	    android:text="Menu" />
+	    android:background="@drawable/context_menu_selector"
+	    />
 </RelativeLayout>
