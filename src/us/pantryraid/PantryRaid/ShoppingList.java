@@ -58,6 +58,8 @@ public class ShoppingList extends ListActivity {
 
 		ActionBar bar = getActionBar();
 		bar.setDisplayShowTitleEnabled(false);
+		bar.setDisplayHomeAsUpEnabled(true);
+		bar.setDisplayShowHomeEnabled(true);
 
 		Log.w(TAG, "Setting up ActionBar");
 
@@ -147,7 +149,14 @@ public class ShoppingList extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.w(TAG, "Calling onOptionsItemSelected");
-			return false;
+	    switch (item.getItemId())
+	    {
+	        case android.R.id.home:
+				startActivity(new Intent(mCtx, Pantry.class));
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 
 	@Override
@@ -188,8 +197,20 @@ public class ShoppingList extends ListActivity {
 						addition = Double.parseDouble(input);
 					}
 					
-	                mDbHelper.addQuantityToItem(selectedItemId, addition);
-	        	    
+					Cursor cursor = mDbHelper.loadItem(selectedItemId);
+					cursor.moveToPosition(0);
+					double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+					int shoppingListLock = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					
+					String toastText = "Current stock now ";
+					double newQuantity = mDbHelper.addQuantityToItem(selectedItemId, addition);
+					if (newQuantity >= threshold && shoppingListLock==0) {
+						toastText += newQuantity+". Threshold reached. Item removed from Shopping List.";
+					} else {
+						toastText += newQuantity+".";
+					}
+	                Toast.makeText(mCtx, toastText, Toast.LENGTH_LONG).show();
+						        	    
 					dialog.cancel();
 					
 	                selectedItemId = null;

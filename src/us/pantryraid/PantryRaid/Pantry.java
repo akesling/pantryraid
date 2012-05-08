@@ -3,25 +3,25 @@ package us.pantryraid.PantryRaid;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +37,7 @@ public class Pantry extends ListActivity {
 	// For logging and debugging purposes
 	private static final String TAG = "Pantry";
 	public static final int INSERT_ID = Menu.FIRST;
-	private Long selectedWordId;
+	private Long selectedItemId;
 
 	//XXX: Flag such that callbacks don't get called on first instantiation.
 	//    private boolean onCreateFlag = true;
@@ -142,7 +142,7 @@ public class Pantry extends ListActivity {
 
 		View listItemView = (View) v.getParent();
 
-		selectedWordId = (Long) v.getTag();
+		selectedItemId = (Long) v.getTag();
 		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.pantryItemName))
 				.getText().toString());
 
@@ -156,32 +156,72 @@ public class Pantry extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.use_item:
-			//Decrease Quantity?
-			//For now, decrement quantity by one.
-			mDbHelper.useItem(selectedWordId);
-			selectedWordId = null;
+			LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+			View layout = inflater.inflate(R.layout.entry_dialog,
+			                               (ViewGroup) findViewById(R.id.layout_root));
+
+			final EditText text = (EditText) layout.findViewById(R.id.value);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setView(layout);
+			
+			builder.setMessage("Enter Numeric Quantity:");
+			
+			builder.setPositiveButton("Use this Much", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					String input = text.getText().toString();
+					Double amountUsed = 0.0;
+					if (input != null && !input.equals("")) {
+						amountUsed = Double.parseDouble(input);
+					}
+					
+					String toastText = "Current stock now ";
+					double newQuantity = mDbHelper.useItem(selectedItemId, amountUsed);
+					if (newQuantity <= 0.0) {
+						toastText += "0.  Item moved to Shopping List.";
+					} else {
+						toastText += newQuantity+".";
+					}
+	                Toast.makeText(mCtx, toastText, Toast.LENGTH_LONG).show();
+	        	    
+					dialog.cancel();
+					
+	                selectedItemId = null;
+	                fillData();
+	           	}});
+		    
+		    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		    
+		    	public void onClick(DialogInterface dialog, int id) {
+		    		dialog.cancel();
+			        selectedItemId = null;
+			    }
+			           
+		    });
+			
+			builder.create().show();
 			return true;
 		case R.id.delete_item:
 			AlertDialog.Builder confirmDeleteBuilder = new AlertDialog.Builder(this);
 			confirmDeleteBuilder.setMessage("Are you sure you want to delete this item?")
 					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 					           public void onClick(DialogInterface dialog, int id) {
-					                mDbHelper.deleteItem(selectedWordId);
-					                selectedWordId = null;
+					                mDbHelper.deleteItem(selectedItemId);
+					                selectedItemId = null;
 					                fillData();
 					           }})
 		           .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
 			                dialog.cancel();
-			                selectedWordId = null;
+			                selectedItemId = null;
 			           }});
 			confirmDeleteBuilder.create().show();
 			return true;
 		case R.id.item_details:	
 			Intent i = new Intent(this, ItemEdit.class);
-			i.putExtra(ItemsDbAdapter.KEY_ROWID, selectedWordId);
+			i.putExtra(ItemsDbAdapter.KEY_ROWID, selectedItemId);
 			startActivityForResult(i, ACTIVITY_VIEW);
-			selectedWordId = null;
+			selectedItemId = null;
 			return true;
 		default:
 			return super.onContextItemSelected(item);

@@ -268,7 +268,7 @@ public class ItemsDbAdapter {
 		mDb.update(DATABASE_TABLE, values, (KEY_ROWID + " = " + itemID),null);
 	}
 
-	public void useItem(Long rowId) {
+	public double useItem(long rowId, double amountUsed) {
 		//get current quantity of item by id
 		//put quantity - 1 in database
 		//If already 0, throw error.
@@ -276,28 +276,35 @@ public class ItemsDbAdapter {
 		Cursor cursor = mDb.query(DATABASE_TABLE, new String[]{KEY_QUANTITY}, 
 				KEY_ROWID + " = " + rowId, null, null, null, null);
 		cursor.moveToFirst(); 
-		long currentQuantity = cursor.getLong(cursor.getColumnIndex(KEY_QUANTITY)) ;
+		double currentQuantity = cursor.getDouble(cursor.getColumnIndex(KEY_QUANTITY)) ;
+		double newQuantity = 0;
 		
-		if (currentQuantity >= 1){
+		if (currentQuantity <= amountUsed){
 			ContentValues cv = new ContentValues();
-			cv.put(KEY_QUANTITY, (currentQuantity - 1));
+			cv.put(KEY_QUANTITY, newQuantity);
 			mDb.update(DATABASE_TABLE, cv, KEY_ROWID + " = " + rowId, null);
-			
-		}else{
-			//throw new InvalidQuantityException();
+		} else {
+			ContentValues cv = new ContentValues();
+			newQuantity = currentQuantity - amountUsed;
+			cv.put(KEY_QUANTITY, currentQuantity-amountUsed);
+			mDb.update(DATABASE_TABLE, cv, KEY_ROWID + " = " + rowId, null);
 		}
 		
+		return newQuantity;
 	}
 
-	public void addQuantityToItem(long rowId, double addition) {
+	public double addQuantityToItem(long rowId, double addition) {
 		Cursor cursor = mDb.query(DATABASE_TABLE, new String[]{KEY_QUANTITY}, 
 				KEY_ROWID + " = " + rowId, null, null, null, null);
 		cursor.moveToFirst();
-		long currentQuantity = cursor.getLong(cursor.getColumnIndex(KEY_QUANTITY)) ;
+		double currentQuantity = cursor.getDouble(cursor.getColumnIndex(KEY_QUANTITY)) ;
+		double newQuantity = currentQuantity + addition;
 		
 		ContentValues cv = new ContentValues();
-		cv.put(KEY_QUANTITY, (currentQuantity + addition));
+		cv.put(KEY_QUANTITY, newQuantity);
 		mDb.update(DATABASE_TABLE, cv, KEY_ROWID + " = " + rowId, null);
+		
+		return newQuantity;
 	}
 
 }
