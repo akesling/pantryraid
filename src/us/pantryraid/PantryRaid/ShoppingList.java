@@ -186,7 +186,8 @@ public class ShoppingList extends ListActivity {
 						addition = Double.parseDouble(input);
 					}
 					
-	                mDbHelper.addQuantityToItem(selectedItemId, addition);
+	                Toast.makeText(mCtx, "Current Stock now "+mDbHelper.addQuantityToItem(selectedItemId, addition), 
+	                		Toast.LENGTH_LONG).show();
 	        	    
 					dialog.cancel();
 					
