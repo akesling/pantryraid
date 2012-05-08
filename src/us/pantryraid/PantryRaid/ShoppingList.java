@@ -58,6 +58,8 @@ public class ShoppingList extends ListActivity {
 
 		ActionBar bar = getActionBar();
 		bar.setDisplayShowTitleEnabled(false);
+		bar.setDisplayHomeAsUpEnabled(true);
+		bar.setDisplayShowHomeEnabled(true);
 
 		Log.w(TAG, "Setting up ActionBar");
 
@@ -145,7 +147,14 @@ public class ShoppingList extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.w(TAG, "Calling onOptionsItemSelected");
-			return false;
+	    switch (item.getItemId())
+	    {
+	        case android.R.id.home:
+				startActivity(new Intent(mCtx, Pantry.class));
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 
 	@Override

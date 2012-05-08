@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,9 @@ public class ItemEdit extends Activity {
 
 		ActionBar bar = getActionBar();
 		bar.setTitle("Edit Item");
+		bar.setDisplayHomeAsUpEnabled(true);
+		bar.setDisplayShowHomeEnabled(true);
+
 		setContentView(R.layout.item_edit);
 
 		mItemTypeText = (EditText) findViewById(R.id.itemType);
@@ -87,6 +91,9 @@ public class ItemEdit extends Activity {
 		case R.id.save:
 			saveItemChanges();
 			return true;
+        case android.R.id.home:
+        	cancelItemChanges();
+            return true;
 		default:
 			return false;
 
