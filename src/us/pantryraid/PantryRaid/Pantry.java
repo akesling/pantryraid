@@ -3,12 +3,10 @@ package us.pantryraid.PantryRaid;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -24,7 +22,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -144,7 +141,7 @@ public class Pantry extends ListActivity {
 
 		View listItemView = (View) v.getParent();
 
-		selectedWordId = (Long) v.getTag();
+		selectedItemId = (Long) v.getTag();
 		menu.setHeaderTitle(((TextView) listItemView.findViewById(R.id.pantryItemName))
 				.getText().toString());
 

@@ -186,9 +186,20 @@ public class ShoppingList extends ListActivity {
 						addition = Double.parseDouble(input);
 					}
 					
-	                Toast.makeText(mCtx, "Current Stock now "+mDbHelper.addQuantityToItem(selectedItemId, addition), 
-	                		Toast.LENGTH_LONG).show();
-	        	    
+					Cursor cursor = mDbHelper.loadItem(selectedItemId);
+					cursor.moveToPosition(0);
+					double threshold = cursor.getDouble(cursor.getColumnIndex(ItemsDbAdapter.KEY_THRESHOLD));
+					int shoppingListLock = cursor.getInt(cursor.getColumnIndex(ItemsDbAdapter.KEY_SHOPLIST_OVERRIDE));
+					
+					String toastText = "Current stock now ";
+					double newQuantity = mDbHelper.addQuantityToItem(selectedItemId, addition);
+					if (newQuantity >= threshold && shoppingListLock==0) {
+						toastText += newQuantity+". Threshold reached. Item removed from Shopping List.";
+					} else {
+						toastText += newQuantity+".";
+					}
+	                Toast.makeText(mCtx, toastText, Toast.LENGTH_LONG).show();
+						        	    
 					dialog.cancel();
 					
 	                selectedItemId = null;
